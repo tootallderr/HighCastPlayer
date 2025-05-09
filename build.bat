@@ -56,6 +56,16 @@ echo [4/4] Build complete!
 echo Package(s) can be found in the 'dist' directory.
 
 echo.
+echo Would you like to run package verification tests?
+set /p runTests="Enter Y to run tests, any other key to skip: "
+
+if /i "%runTests%"=="Y" (
+    echo Running package verification tests...
+    set PACKAGED_TEST=true
+    call npm run test
+)
+
+echo.
 echo ===================================================
 echo Testing checklist:
 echo ===================================================
@@ -65,6 +75,7 @@ echo 2. Verify all features work in the packaged version
 echo 3. Check file permissions and access
 echo 4. Test auto-update functionality
 echo 5. Confirm bundled dependencies load correctly
+echo 6. Verify auto-start functionality
 
 echo.
 echo Would you like to open the output directory?

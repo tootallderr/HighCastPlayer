@@ -134,4 +134,47 @@ for (const dir of requiredDirs) {
 }
 
 log('');
+
+// Check if the test is being run on a packaged app
+if (process.env.PACKAGED_TEST === 'true') {
+  log('4. Testing Packaged Application...');
+  
+  try {
+    // Require and run the package tests
+    const packageTests = require('./test-packaging');
+    log('Running package verification tests...');
+    
+    // We need to make this synchronous for the verification script
+    const testPackageSync = () => {
+      try {
+        log('Testing bundled dependencies...');
+        // Test for ffmpeg-static
+        const ffmpegPath = require('ffmpeg-static');
+        log(`- ffmpeg-static: ${ffmpegPath ? 'FOUND ✅' : 'MISSING ❌'}`);
+        
+        log('Testing data directories...');
+        const dataDir = path.join(process.cwd(), 'data');
+        log(`- Data directory: ${fs.existsSync(dataDir) ? 'EXISTS ✅' : 'MISSING ❌'}`);
+        
+        // Test write access to data dir
+        const testFile = path.join(dataDir, '.write-test');
+        fs.writeFileSync(testFile, 'test');
+        fs.unlinkSync(testFile);
+        log('- Data directory write access: SUCCESS ✅');
+        
+        return true;
+      } catch (err) {
+        log(`Package verification error: ${err.message} ❌`);
+        return false;
+      }
+    };
+    
+    const packageTestResult = testPackageSync();
+    log(`Package verification ${packageTestResult ? 'PASSED ✅' : 'FAILED ❌'}`);
+  } catch (err) {
+    log(`Failed to run package tests: ${err.message} ❌`);
+  }
+}
+
+log('');
 log('=== Verification Complete ===');

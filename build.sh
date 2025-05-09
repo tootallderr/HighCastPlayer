@@ -3,7 +3,7 @@
 echo "==================================================="
 echo "IPTV Player Package Build and Test Script"
 echo "==================================================="
-echo ""
+echo
 
 echo "[1/4] Checking prerequisites..."
 if ! command -v node &> /dev/null; then
@@ -20,12 +20,12 @@ fi
 
 echo "[3/4] Building packages..."
 echo "Which platform would you like to build for?"
-echo ""
-echo "1) Windows (.exe) - best on Windows"
+echo
+echo "1) Windows (.exe) - requires Wine on macOS/Linux"
 echo "2) macOS (.app/.dmg) - requires macOS"
 echo "3) Linux (.AppImage/.deb) - best on Linux"
 echo "4) All platforms (may have limitations on current OS)"
-echo ""
+echo
 
 read -p "Enter your choice (1-4): " choice
 
@@ -57,31 +57,40 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo ""
+echo
 echo "[4/4] Build complete!"
 echo "Package(s) can be found in the 'dist' directory."
 
-echo ""
+echo
+read -p "Would you like to run package verification tests? (y/n): " runTests
+
+if [[ "$runTests" == "y" || "$runTests" == "Y" ]]; then
+    echo "Running package verification tests..."
+    PACKAGED_TEST=true npm run test
+fi
+
+echo
 echo "==================================================="
 echo "Testing checklist:"
 echo "==================================================="
-echo ""
+echo
 echo "1. Install the package on a clean system"
 echo "2. Verify all features work in the packaged version"
 echo "3. Check file permissions and access"
 echo "4. Test auto-update functionality"
 echo "5. Confirm bundled dependencies load correctly"
+echo "6. Verify auto-start functionality"
 
-echo ""
+echo
 read -p "Would you like to open the output directory? (y/n): " open
 
-if [[ $open == "y" || $open == "Y" ]]; then
+if [[ "$open" == "y" || "$open" == "Y" ]]; then
     if [[ "$OSTYPE" == "darwin"* ]]; then
         open "dist"
     elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        xdg-open "dist" &> /dev/null || nautilus "dist" &> /dev/null || dolphin "dist" &> /dev/null || nemo "dist" &> /dev/null || thunar "dist" &> /dev/null
+        xdg-open "dist" 2>/dev/null || nautilus "dist" 2>/dev/null || dolphin "dist" 2>/dev/null || thunar "dist" 2>/dev/null
     fi
 fi
 
-echo ""
+echo
 echo "Done."

@@ -235,7 +235,7 @@
   * [ ] Save caption preferences in settings
 
 * [ ] **AI-Powered Caption Enhancement:**
-  * [ ] Integrate Ollama with phi4-mini-reasoning model
+  * [ ] Integrate Ollama with gemma3:4b model
   * [ ] Real-time audio transcription capabilities
   * [ ] Caption translation modes:
     * [ ] Standard (verbatim transcription)

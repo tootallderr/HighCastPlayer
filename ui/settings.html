@@ -1203,7 +1203,6 @@
                 // ---- Application Settings Tab ----
                 
                 // Auto-start handling
-                const autoStartToggle = document.getElementById('auto-start-toggle');
                 if (autoStartToggle) {
                     // Get current auto-start status
                     window.ipcRenderer.send('get-auto-start-status');
@@ -1230,9 +1229,7 @@
                 // Update handling
                 const checkUpdatesBtn = document.getElementById('check-for-updates-btn');
                 const updateStatus = document.getElementById('update-status');
-                const updateNotificationRow = document.getElementById('update-notification-row');
-                const updateNotificationText = document.getElementById('update-notification-text');
-                const installUpdateBtn = document.getElementById('install-update-btn');
+                // These variables are already declared above
                 const appVersion = document.getElementById('app-version');
                 const appPlatform = document.getElementById('app-platform');
                 

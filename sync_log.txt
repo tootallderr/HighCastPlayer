@@ -149,3 +149,43 @@ warning: in the working copy of 'tests/test-data/test-playlist.m3u8', LF will be
 2025-05-09 10:21:11,082 - INFO - ✅ Remote URL is already correctly set
 2025-05-09 10:21:11,082 - INFO - 🔧 Applying Git configurations...
 2025-05-09 10:21:11,320 - INFO - 🔍 Using branch: master
+2025-05-09 10:21:12,107 - WARNING - ⚠️ The following files are larger than 90MB and will be added to .gitignore:
+2025-05-09 10:21:12,107 - WARNING -    - node_modules/electron/dist/electron.exe
+2025-05-09 10:21:12,158 - INFO - ✅ Updated .gitignore with large files.
+2025-05-09 10:21:12,158 - INFO - 📦 Staging files (respecting .gitignore)...
+2025-05-09 10:21:12,158 - INFO - Running: git add .
+2025-05-09 10:21:12,245 - WARNING - ⚠️ warning: in the working copy of 'build.sh', LF will be replaced by CRLF the next time Git touches it
+2025-05-09 10:21:12,439 - INFO - 📝 Committing changes...
+2025-05-09 10:21:12,440 - INFO - Running: git commit -m "📝 Auto-sync on 2025-05-09 10:21:10"
+2025-05-09 10:21:12,535 - INFO - [master 398bd36] 📝 Auto-sync on 2025-05-09 10:21:10
+ 6 files changed, 378 insertions(+), 6 deletions(-)
+2025-05-09 10:21:12,868 - INFO - ✅ Remote branch 'master' exists
+2025-05-09 10:21:12,868 - INFO - ⬇️ Pulling latest changes from remote...
+2025-05-09 10:21:12,868 - INFO - Running: git pull --no-edit origin master
+2025-05-09 10:21:13,271 - INFO - Already up to date.
+2025-05-09 10:21:13,271 - INFO - From https://github.com/tootallderr/HighCastPlayer
+ * branch            master     -> FETCH_HEAD
+2025-05-09 10:21:13,271 - INFO - ⬆️ Force pushing to GitHub (overwriting remote)...
+2025-05-09 10:21:13,271 - INFO - Running: git push --force origin master
+2025-05-09 10:21:14,551 - INFO - To https://github.com/tootallderr/HighCastPlayer
+   9b722d6..398bd36  master -> master
+2025-05-09 10:21:14,551 - INFO - 
+✅ Sync to GitHub complete!
+2025-05-09 10:21:14,767 - INFO - ℹ️ 14 files/directories are being ignored by .gitignore
+2025-05-09 10:21:14,767 - INFO -    - build/
+2025-05-09 10:21:14,768 - INFO -    - node_modules/
+2025-05-09 10:21:14,768 - INFO -    - tests/diagnostic_run.log
+2025-05-09 10:21:14,768 - INFO -    - ... and 11 more
+2025-05-09 10:29:29,383 - WARNING - ⚠️ tqdm not installed, running without progress bar
+2025-05-09 10:29:29,384 - INFO - 🚀 Starting sync process...
+
+2025-05-09 10:29:29,685 - INFO - 🧹 Cleaning up Git repository...
+2025-05-09 10:29:29,686 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\info\commit-graph: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\info\\commit-graph'
+2025-05-09 10:29:29,687 - INFO - ✅ Removed garbage file: c:\Users\GEorg\Desktop\TV\.git\objects\info\packs
+2025-05-09 10:29:29,687 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-f2cc41ce03477ee62ec2fb0830175fd2ae6f4f8b.idx: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-f2cc41ce03477ee62ec2fb0830175fd2ae6f4f8b.idx'
+2025-05-09 10:29:29,687 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-f2cc41ce03477ee62ec2fb0830175fd2ae6f4f8b.pack: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-f2cc41ce03477ee62ec2fb0830175fd2ae6f4f8b.pack'
+2025-05-09 10:29:29,688 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-f2cc41ce03477ee62ec2fb0830175fd2ae6f4f8b.rev: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-f2cc41ce03477ee62ec2fb0830175fd2ae6f4f8b.rev'
+2025-05-09 10:29:29,959 - INFO - 🔧 Checking for broken references...
+2025-05-09 10:29:30,053 - INFO - ✅ Remote URL is already correctly set
+2025-05-09 10:29:30,053 - INFO - 🔧 Applying Git configurations...
+2025-05-09 10:29:30,297 - INFO - 🔍 Using branch: master
