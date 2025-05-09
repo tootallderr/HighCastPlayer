@@ -1165,8 +1165,7 @@
                     }
                 }
                 
-                // Load caption settings
-                async function loadCaptionSettings() {
+                // Load caption settings                async function loadCaptionSettings() {
                     try {
                         const captionSettings = await window.api.getCaptionSettings();
                         
@@ -1204,10 +1203,124 @@
                         document.getElementById('ollama-endpoint').value = captionSettings.aiEnhancement.ollamaEndpoint;
                         document.getElementById('ollama-model').value = captionSettings.aiEnhancement.model;
                         
+                        // Set the status text
+                        const statusEl = document.getElementById('ollama-status');
+                        if (captionSettings.aiEnhancement.enabled) {
+                            statusEl.textContent = 'Ollama enabled';
+                            statusEl.style.color = '#4CAF50';
+                        } else {
+                            statusEl.textContent = 'AI enhancement disabled';
+                            statusEl.style.color = '#888';
+                        }
+                        
+                        // Add preview for caption styles
+                        updateCaptionPreview();
+                        
                     } catch (error) {
                         console.error('Error loading caption settings:', error);
                         showNotification('caption-settings-notification', 'Failed to load caption settings', 'error');
                     }
+                }
+                
+                // Create caption preview function
+                function updateCaptionPreview() {
+                    // Get values from form
+                    const size = document.getElementById('caption-size').value;
+                    const color = document.getElementById('caption-color').value;
+                    const bgColor = document.getElementById('caption-bg-color').value;
+                    const opacity = document.getElementById('caption-bg-opacity').value / 100;
+                    const position = document.getElementById('caption-position').value;
+                    const font = document.getElementById('caption-font').value;
+                    
+                    // Generate background color
+                    const backgroundColor = hexToRgba(bgColor, opacity);
+                    
+                    // Get or create preview element
+                    let previewEl = document.getElementById('caption-preview');
+                    if (!previewEl) {
+                        previewEl = document.createElement('div');
+                        previewEl.id = 'caption-preview';
+                        previewEl.style.marginTop = '20px';
+                        previewEl.style.marginBottom = '20px';
+                        previewEl.style.padding = '10px';
+                        previewEl.style.border = '1px solid #444';
+                        previewEl.style.borderRadius = '4px';
+                        previewEl.style.position = 'relative';
+                        previewEl.style.height = '100px';
+                        previewEl.style.background = '#111';
+                        
+                        // Insert it after the form actions
+                        const formActions = document.querySelector('.form-actions');
+                        formActions.parentNode.insertBefore(previewEl, formActions);
+                    }
+                    
+                    // Create or update caption sample
+                    let captionSample = document.getElementById('caption-sample');
+                    if (!captionSample) {
+                        captionSample = document.createElement('div');
+                        captionSample.id = 'caption-sample';
+                        previewEl.appendChild(captionSample);
+                    }
+                    
+                    // Apply styles
+                    captionSample.style.position = 'absolute';
+                    captionSample.style.left = '50%';
+                    captionSample.style.transform = 'translateX(-50%)';
+                    captionSample.style.backgroundColor = backgroundColor;
+                    captionSample.style.color = color;
+                    captionSample.style.padding = '6px 12px';
+                    captionSample.style.borderRadius = '4px';
+                    captionSample.style.maxWidth = '80%';
+                    captionSample.style.textAlign = 'center';
+                    
+                    // Apply size
+                    if (size === 'small') {
+                        captionSample.style.fontSize = '16px';
+                    } else if (size === 'medium') {
+                        captionSample.style.fontSize = '22px';
+                    } else {
+                        captionSample.style.fontSize = '28px';
+                    }
+                    
+                    // Apply font
+                    if (font === 'sans-serif') {
+                        captionSample.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+                    } else if (font === 'serif') {
+                        captionSample.style.fontFamily = 'Georgia, "Times New Roman", serif';
+                    } else {
+                        captionSample.style.fontFamily = '"Courier New", Courier, monospace';
+                    }
+                    
+                    // Apply position
+                    if (position === 'top') {
+                        captionSample.style.top = '10px';
+                        captionSample.style.bottom = 'auto';
+                    } else if (position === 'middle') {
+                        captionSample.style.top = '50%';
+                        captionSample.style.transform = 'translate(-50%, -50%)';
+                        captionSample.style.bottom = 'auto';
+                    } else {
+                        captionSample.style.bottom = '10px';
+                        captionSample.style.top = 'auto';
+                    }
+                    
+                    // Set sample text
+                    const aiEnabled = document.getElementById('enable-ai-captions').checked;
+                    const aiMode = document.getElementById('caption-ai-mode').value;
+                    
+                    let sampleText = 'This is a sample caption';
+                    
+                    if (aiEnabled) {
+                        if (aiMode === 'simplified') {
+                            sampleText = '🔍 This is a simplified caption';
+                        } else if (aiMode === 'academic') {
+                            sampleText = '📚 This is an academic caption with explanations';
+                        } else if (aiMode === 'casual') {
+                            sampleText = '🗣 This is a casual conversation style caption';
+                        }
+                    }
+                    
+                    captionSample.textContent = sampleText;
                 }
                 
                 // Save caption settings

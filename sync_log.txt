@@ -302,3 +302,76 @@ remove the file manually to continue.
 2025-05-09 11:08:35,302 - INFO - ✅ Updated .gitignore with large files.
 2025-05-09 11:08:35,303 - INFO - 📦 Staging files (respecting .gitignore)...
 2025-05-09 11:08:35,303 - INFO - Running: git add .
+2025-05-09 11:08:35,522 - INFO - 📝 Committing changes...
+2025-05-09 11:08:35,522 - INFO - Running: git commit -m "📝 Auto-sync on 2025-05-09 11:08:33"
+2025-05-09 11:08:35,569 - INFO - 📝 Committing changes...
+2025-05-09 11:08:35,569 - INFO - Running: git commit -m "📝 Auto-sync on 2025-05-09 11:08:33"
+2025-05-09 11:08:35,623 - INFO - [master 2a7b770] 📝 Auto-sync on 2025-05-09 11:08:33
+ 4 files changed, 201 insertions(+), 15 deletions(-)
+2025-05-09 11:08:35,628 - INFO - On branch master
+Your branch is ahead of 'origin/master' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   sync_log.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+2025-05-09 11:08:35,975 - INFO - ✅ Remote branch 'master' exists
+2025-05-09 11:08:35,975 - INFO - ✅ Remote branch 'master' exists
+2025-05-09 11:08:35,975 - INFO - ⬇️ Pulling latest changes from remote...
+2025-05-09 11:08:35,975 - INFO - ⬇️ Pulling latest changes from remote...
+2025-05-09 11:08:35,975 - INFO - Running: git pull --no-edit origin master
+2025-05-09 11:08:35,975 - INFO - Running: git pull --no-edit origin master
+2025-05-09 11:08:36,373 - INFO - Already up to date.
+2025-05-09 11:08:36,373 - INFO - From https://github.com/tootallderr/HighCastPlayer
+ * branch            master     -> FETCH_HEAD
+2025-05-09 11:08:36,373 - INFO - ⬆️ Force pushing to GitHub (overwriting remote)...
+2025-05-09 11:08:36,373 - INFO - Running: git push --force origin master
+2025-05-09 11:08:36,389 - INFO - Already up to date.
+2025-05-09 11:08:36,389 - INFO - From https://github.com/tootallderr/HighCastPlayer
+ * branch            master     -> FETCH_HEAD
+2025-05-09 11:08:36,389 - INFO - ⬆️ Force pushing to GitHub (overwriting remote)...
+2025-05-09 11:08:36,389 - INFO - Running: git push --force origin master
+2025-05-09 11:08:37,621 - INFO - To https://github.com/tootallderr/HighCastPlayer
+   e457f42..2a7b770  master -> master
+2025-05-09 11:08:37,622 - INFO - 
+✅ Sync to GitHub complete!
+2025-05-09 11:08:37,634 - ERROR - ❌ To https://github.com/tootallderr/HighCastPlayer
+ ! [remote rejected] master -> master (cannot lock ref 'refs/heads/master': is at 2a7b770c187f6e555fa41f327b46e99f789a1ae2 but expected e457f42f85818bb7ca69f3fd008865bcaf949844)
+error: failed to push some refs to 'https://github.com/tootallderr/HighCastPlayer'
+2025-05-09 11:08:37,634 - ERROR - ❌ Push failed: To https://github.com/tootallderr/HighCastPlayer
+ ! [remote rejected] master -> master (cannot lock ref 'refs/heads/master': is at 2a7b770c187f6e555fa41f327b46e99f789a1ae2 but expected e457f42f85818bb7ca69f3fd008865bcaf949844)
+error: failed to push some refs to 'https://github.com/tootallderr/HighCastPlayer'
+2025-05-09 11:08:37,843 - INFO - ℹ️ 14 files/directories are being ignored by .gitignore
+2025-05-09 11:08:37,843 - INFO -    - build/
+2025-05-09 11:08:37,843 - INFO -    - node_modules/
+2025-05-09 11:08:37,843 - INFO -    - tests/diagnostic_run.log
+2025-05-09 11:08:37,843 - INFO -    - ... and 11 more
+2025-05-09 11:09:28,937 - WARNING - ⚠️ tqdm not installed, running without progress bar
+2025-05-09 11:09:28,938 - INFO - 🚀 Starting sync process...
+
+2025-05-09 11:09:28,938 - INFO - 🚀 Starting sync process...
+
+2025-05-09 11:09:29,110 - INFO - 🧹 Cleaning up Git repository...
+2025-05-09 11:09:29,111 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\info\commit-graph: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\info\\commit-graph'
+2025-05-09 11:09:29,112 - INFO - ✅ Removed garbage file: c:\Users\GEorg\Desktop\TV\.git\objects\info\packs
+2025-05-09 11:09:29,112 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.idx: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.idx'
+2025-05-09 11:09:29,112 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.pack: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.pack'
+2025-05-09 11:09:29,113 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.rev: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.rev'
+2025-05-09 11:09:29,256 - INFO - 🧹 Cleaning up Git repository...
+2025-05-09 11:09:29,257 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\info\commit-graph: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\info\\commit-graph'
+2025-05-09 11:09:29,258 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.idx: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.idx'
+2025-05-09 11:09:29,258 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.pack: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.pack'
+2025-05-09 11:09:29,258 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.rev: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-85eec404570d8aec1a68be78dbb1b7ab195e14f3.rev'
+2025-05-09 11:09:29,258 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\tmp_pack_Lzb921: [WinError 32] The process cannot access the file because it is being used by another process: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\tmp_pack_Lzb921'
+2025-05-09 11:09:29,314 - ERROR - ❌ fatal: gc is already running on machine 'desktop' pid 26792 (use --force if not)
+2025-05-09 11:09:29,314 - INFO - 🔧 Checking for broken references...
+2025-05-09 11:09:29,389 - INFO - 🔧 Checking for broken references...
+2025-05-09 11:09:29,409 - INFO - ✅ Remote URL is already correctly set
+2025-05-09 11:09:29,409 - INFO - 🔧 Applying Git configurations...
+2025-05-09 11:09:29,482 - INFO - ✅ Remote URL is already correctly set
+2025-05-09 11:09:29,482 - INFO - 🔧 Applying Git configurations...
+2025-05-09 11:09:29,646 - INFO - 🔍 Using branch: master
+2025-05-09 11:09:29,715 - INFO - 🔍 Using branch: master
