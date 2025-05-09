@@ -375,3 +375,70 @@ error: failed to push some refs to 'https://github.com/tootallderr/HighCastPlaye
 2025-05-09 11:09:29,482 - INFO - 🔧 Applying Git configurations...
 2025-05-09 11:09:29,646 - INFO - 🔍 Using branch: master
 2025-05-09 11:09:29,715 - INFO - 🔍 Using branch: master
+2025-05-09 11:09:30,631 - WARNING - ⚠️ The following files are larger than 90MB and will be added to .gitignore:
+2025-05-09 11:09:30,631 - WARNING - ⚠️ The following files are larger than 90MB and will be added to .gitignore:
+2025-05-09 11:09:30,631 - WARNING -    - node_modules/electron/dist/electron.exe
+2025-05-09 11:09:30,631 - WARNING -    - node_modules/electron/dist/electron.exe
+2025-05-09 11:09:30,689 - ERROR - ❌ fatal: Unable to create 'C:/Users/GEorg/Desktop/TV/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
+2025-05-09 11:09:30,690 - INFO - ✅ Updated .gitignore with large files.
+2025-05-09 11:09:30,690 - INFO - 📦 Staging files (respecting .gitignore)...
+2025-05-09 11:09:30,690 - INFO - ✅ Updated .gitignore with large files.
+2025-05-09 11:09:30,690 - INFO - Running: git add .
+2025-05-09 11:09:30,690 - INFO - 📦 Staging files (respecting .gitignore)...
+2025-05-09 11:09:30,690 - INFO - Running: git add .
+2025-05-09 11:09:30,740 - ERROR - ❌ fatal: Unable to create 'C:/Users/GEorg/Desktop/TV/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
+2025-05-09 11:09:30,740 - ERROR - Command failed: git add .
+2025-05-09 11:09:30,740 - ERROR - Error: fatal: Unable to create 'C:/Users/GEorg/Desktop/TV/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
+2025-05-09 11:09:30,740 - WARNING - ⚠️ Failed to add all files at once, trying batch mode...
+2025-05-09 11:09:30,741 - INFO - Running: git add "-p"
+2025-05-09 11:09:30,946 - INFO - 📝 Committing changes...
+2025-05-09 11:09:30,946 - INFO - Running: git commit -m "📝 Auto-sync on 2025-05-09 11:09:28"
+2025-05-09 11:09:31,047 - INFO - [master 482cdfb] 📝 Auto-sync on 2025-05-09 11:09:28
+ 3 files changed, 190 insertions(+), 2 deletions(-)
+2025-05-09 11:09:31,403 - INFO - ✅ Remote branch 'master' exists
+2025-05-09 11:09:31,403 - INFO - ⬇️ Pulling latest changes from remote...
+2025-05-09 11:09:31,403 - INFO - Running: git pull --no-edit origin master
+2025-05-09 11:09:31,818 - INFO - Already up to date.
+2025-05-09 11:09:31,818 - INFO - From https://github.com/tootallderr/HighCastPlayer
+ * branch            master     -> FETCH_HEAD
+2025-05-09 11:09:31,818 - INFO - ⬆️ Force pushing to GitHub (overwriting remote)...
+2025-05-09 11:09:31,818 - INFO - Running: git push --force origin master
+2025-05-09 11:09:33,062 - INFO - To https://github.com/tootallderr/HighCastPlayer
+   2a7b770..482cdfb  master -> master
+2025-05-09 11:09:33,062 - INFO - 
+✅ Sync to GitHub complete!
+2025-05-09 11:09:33,278 - INFO - ℹ️ 14 files/directories are being ignored by .gitignore
+2025-05-09 11:09:33,278 - INFO -    - build/
+2025-05-09 11:09:33,278 - INFO -    - node_modules/
+2025-05-09 11:09:33,278 - INFO -    - tests/diagnostic_run.log
+2025-05-09 11:09:33,278 - INFO -    - ... and 11 more
+2025-05-09 12:15:59,215 - INFO - 🚀 Starting sync process...
+
+2025-05-09 12:15:59,439 - INFO - 🧹 Cleaning up Git repository...
+2025-05-09 12:15:59,441 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\info\commit-graph: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\info\\commit-graph'
+2025-05-09 12:15:59,441 - INFO - ✅ Removed garbage file: c:\Users\GEorg\Desktop\TV\.git\objects\info\packs
+2025-05-09 12:15:59,442 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-c31c23a392878a9b2320171e770cad1b1575fb20.idx: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-c31c23a392878a9b2320171e770cad1b1575fb20.idx'
+2025-05-09 12:15:59,442 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-c31c23a392878a9b2320171e770cad1b1575fb20.pack: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-c31c23a392878a9b2320171e770cad1b1575fb20.pack'
+2025-05-09 12:15:59,442 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-c31c23a392878a9b2320171e770cad1b1575fb20.rev: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-c31c23a392878a9b2320171e770cad1b1575fb20.rev'
+2025-05-09 12:15:59,773 - INFO - 🔧 Checking for broken references...
+2025-05-09 12:15:59,905 - INFO - ✅ Remote URL is already correctly set
+2025-05-09 12:15:59,905 - INFO - 🔧 Applying Git configurations...
+2025-05-09 12:16:00,238 - INFO - 🔍 Using branch: master
