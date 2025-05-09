@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  iptv-player:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iptv-player
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+      - ./recordings:/app/recordings
+    environment:
+      - NODE_ENV=production

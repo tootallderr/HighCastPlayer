@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Recording - IPTV Player</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #151515;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            color: #0078d7;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        
+        select, input, button {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            background-color: #252525;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        input[type="datetime-local"] {
+            color: #fff;
+        }
+        
+        button {
+            background-color: #0078d7;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #0086f0;
+        }
+        
+        button.cancel {
+            background-color: #555;
+        }
+        
+        button.cancel:hover {
+            background-color: #666;
+        }
+        
+        .recording-list {
+            margin-top: 30px;
+        }
+        
+        .recording-item {
+            background-color: #252525;
+            border-radius: 4px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .recording-item .details {
+            flex-grow: 1;
+        }
+        
+        .recording-item .title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .recording-item .info {
+            font-size: 12px;
+            color: #aaa;
+        }
+        
+        .recording-item .status {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+        }
+        
+        .recording-item .status.scheduled {
+            background-color: #0078d7;
+        }
+        
+        .recording-item .status.recording {
+            background-color: #e74c3c;
+        }
+        
+        .recording-item .status.completed {
+            background-color: #2ecc71;
+        }
+        
+        .recording-item .status.failed {
+            background-color: #e67e22;
+        }
+        
+        .recording-item .actions {
+            display: flex;
+        }
+        
+        .recording-item .action-button {
+            background: transparent;
+            border: none;
+            color: #0078d7;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+            padding: 0;
+        }
+        
+        .recording-item .action-button:hover {
+            color: #fff;
+            background-color: rgba(0, 120, 215, 0.2);
+            border-radius: 4px;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-left: 3px solid #e74c3c;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .success-message {
+            color: #2ecc71;
+            background-color: rgba(46, 204, 113, 0.1);
+            border-left: 3px solid #2ecc71;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Schedule Recording</h2>
+        
+        <div class="error-message" id="error-message"></div>
+        <div class="success-message" id="success-message"></div>
+        
+        <div class="form-group">
+            <label for="channel-select">Select Channel:</label>
+            <select id="channel-select" required>
+                <option value="">Loading channels...</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="recording-title">Recording Title:</label>
+            <input type="text" id="recording-title" placeholder="Enter recording title (optional)">
+        </div>
+        
+        <div class="form-group">
+            <label for="start-time">Start Time:</label>
+            <input type="datetime-local" id="start-time" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="duration">Duration (minutes):</label>
+            <input type="number" id="duration" value="60" min="1" max="360" required>
+        </div>
+        
+        <button id="schedule-button">Schedule Recording</button>
+        <button id="cancel-button" class="cancel">Cancel</button>
+        
+        <div class="recording-list">
+            <h3>Scheduled Recordings</h3>
+            <div id="recordings-container">
+                <!-- Scheduled recordings will be listed here -->
+                <div class="loading">Loading scheduled recordings...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Wait for the API to be ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // DOM Elements
+                const channelSelect = document.getElementById('channel-select');
+                const recordingTitle = document.getElementById('recording-title');
+                const startTimeInput = document.getElementById('start-time');
+                const durationInput = document.getElementById('duration');
+                const scheduleButton = document.getElementById('schedule-button');
+                const cancelButton = document.getElementById('cancel-button');
+                const recordingsContainer = document.getElementById('recordings-container');
+                const errorMessage = document.getElementById('error-message');
+                const successMessage = document.getElementById('success-message');
+                
+                // Set default start time to now + 10 minutes
+                const now = new Date();
+                now.setMinutes(now.getMinutes() + 10);
+                startTimeInput.value = formatDateTimeLocal(now);
+                
+                // Load channels
+                loadChannels();
+                
+                // Load scheduled recordings
+                loadScheduledRecordings();
+                
+                // Event handlers
+                scheduleButton.addEventListener('click', scheduleRecording);
+                cancelButton.addEventListener('click', closeDialog);
+                
+                // Functions
+                async function loadChannels() {
+                    try {
+                        const channels = await window.api.getChannels();
+                        
+                        // Clear loading option
+                        channelSelect.innerHTML = '';
+                        
+                        // Add select option prompt
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = '';
+                        defaultOption.textContent = 'Select a channel...';
+                        channelSelect.appendChild(defaultOption);
+                        
+                        // Group channels by their groups
+                        const channelsByGroup = {};
+                        
+                        channels.forEach(channel => {
+                            const group = channel.group || 'Uncategorized';
+                            
+                            if (!channelsByGroup[group]) {
+                                channelsByGroup[group] = [];
+                            }
+                            
+                            channelsByGroup[group].push(channel);
+                        });
+                        
+                        // Sort groups
+                        const sortedGroups = Object.keys(channelsByGroup).sort();
+                        
+                        // Add channel options grouped by optgroup
+                        sortedGroups.forEach(group => {
+                            const optgroup = document.createElement('optgroup');
+                            optgroup.label = group;
+                            
+                            channelsByGroup[group].forEach(channel => {
+                                const option = document.createElement('option');
+                                option.value = channel.id;
+                                option.textContent = channel.title;
+                                optgroup.appendChild(option);
+                            });
+                            
+                            channelSelect.appendChild(optgroup);
+                        });
+                    } catch (error) {
+                        showError(`Error loading channels: ${error.message}`);
+                    }
+                }
+                
+                async function loadScheduledRecordings() {
+                    try {
+                        const recordings = await window.api.getScheduledRecordings();
+                        renderRecordings(recordings);
+                    } catch (error) {
+                        showError(`Error loading scheduled recordings: ${error.message}`);
+                    }
+                }
+                
+                function renderRecordings(recordings) {
+                    if (!recordings || recordings.length === 0) {
+                        recordingsContainer.innerHTML = '<p>No scheduled recordings.</p>';
+                        return;
+                    }
+                    
+                    recordingsContainer.innerHTML = '';
+                    
+                    // Sort by start time (newest first)
+                    recordings.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+                    
+                    recordings.forEach(recording => {
+                        const item = document.createElement('div');
+                        item.className = 'recording-item';
+                        
+                        const details = document.createElement('div');
+                        details.className = 'details';
+                        
+                        const title = document.createElement('div');
+                        title.className = 'title';
+                        title.textContent = recording.title;
+                        
+                        const start = new Date(recording.startTime);
+                        const info = document.createElement('div');
+                        info.className = 'info';
+                        info.textContent = `${start.toLocaleString()} · ${recording.durationMinutes} minutes`;
+                        
+                        const status = document.createElement('span');
+                        status.className = `status ${recording.status}`;
+                        status.textContent = recording.status;
+                        
+                        details.appendChild(title);
+                        details.appendChild(info);
+                        details.appendChild(status);
+                        
+                        const actions = document.createElement('div');
+                        actions.className = 'actions';
+                        
+                        if (recording.status === 'scheduled') {
+                            const cancelButton = document.createElement('button');
+                            cancelButton.className = 'action-button';
+                            cancelButton.innerHTML = '❌';
+                            cancelButton.title = 'Cancel Recording';
+                            cancelButton.addEventListener('click', () => cancelRecording(recording.id));
+                            actions.appendChild(cancelButton);
+                        }
+                        
+                        item.appendChild(details);
+                        item.appendChild(actions);
+                        recordingsContainer.appendChild(item);
+                    });
+                }
+                
+                async function scheduleRecording() {
+                    const channelId = channelSelect.value;
+                    const title = recordingTitle.value.trim() || null;
+                    const startTimeStr = startTimeInput.value;
+                    const durationMinutes = parseInt(durationInput.value);
+                    
+                    if (!channelId) {
+                        return showError('Please select a channel');
+                    }
+                    
+                    if (!startTimeStr) {
+                        return showError('Please select a start time');
+                    }
+                    
+                    if (!durationMinutes || durationMinutes <= 0) {
+                        return showError('Please enter a valid duration');
+                    }
+                    
+                    // Parse the datetime-local value to a Date object
+                    const startTime = new Date(startTimeStr);
+                    
+                    // Ensure start time is in the future
+                    if (startTime <= new Date()) {
+                        return showError('Start time must be in the future');
+                    }
+                    
+                    try {
+                        // Clear any previous messages
+                        clearMessages();
+                        
+                        // Schedule the recording
+                        const result = await window.api.scheduleRecording(
+                            channelId,
+                            startTime.toISOString(),
+                            durationMinutes,
+                            title || `Recording of ${channelSelect.options[channelSelect.selectedIndex].textContent}`
+                        );
+                        
+                        // Show success message
+                        showSuccess('Recording scheduled successfully');
+                        
+                        // Reload the recordings list
+                        loadScheduledRecordings();
+                    } catch (error) {
+                        showError(`Failed to schedule recording: ${error.message}`);
+                    }
+                }
+                
+                async function cancelRecording(recordingId) {
+                    try {
+                        const result = await window.api.cancelScheduledRecording(recordingId);
+                        if (result && result.success) {
+                            showSuccess('Recording cancelled');
+                            loadScheduledRecordings();
+                        } else {
+                            showError('Failed to cancel recording');
+                        }
+                    } catch (error) {
+                        showError(`Error cancelling recording: ${error.message}`);
+                    }
+                }
+                
+                function closeDialog() {
+                    window.close();
+                }
+                
+                // Utility functions
+                function formatDateTimeLocal(date) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    
+                    return `${year}-${month}-${day}T${hours}:${minutes}`;
+                }
+                
+                function showError(message) {
+                    errorMessage.textContent = message;
+                    errorMessage.style.display = 'block';
+                    successMessage.style.display = 'none';
+                }
+                
+                function showSuccess(message) {
+                    successMessage.textContent = message;
+                    successMessage.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                }
+                
+                function clearMessages() {
+                    errorMessage.style.display = 'none';
+                    successMessage.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Initialization error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

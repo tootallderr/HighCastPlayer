@@ -1,0 +1,21 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="nasa-public" tvg-name="NASA Public Channel" tvg-logo="https://www.nasa.gov/wp-content/themes/nasa/assets/images/nasa-logo.svg" group-title="Science",NASA Public Channel
+https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master.m3u8
+#EXTINF:-1 tvg-id="redbull" tvg-name="Red Bull TV" tvg-logo="https://www.redbull.com/v3/resources/images/appdata/favicon.ico" group-title="Sports",Red Bull TV
+https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8
+#EXTINF:-1 tvg-id="reuters" tvg-name="Reuters TV" tvg-logo="https://www.reuters.tv/favicon.ico" group-title="News",Reuters TV
+https://reuters-reutersnow-1.plex.wurl.com/manifest/playlist.m3u8
+#EXTINF:-1 tvg-id="weather" tvg-name="Weather Channel" tvg-logo="https://weather.com/favicon.ico" group-title="Weather",Weather Channel
+https://weather-lh.akamaihd.net/i/twc_1@92006/master.m3u8
+#EXTINF:-1 tvg-id="broken1" tvg-name="Broken Stream 1 (404)" tvg-logo="" group-title="Test",Broken Stream 1 (404)
+https://example.com/nonexistent-stream.m3u8
+#EXTINF:-1 tvg-id="broken2" tvg-name="Broken Stream 2 (Invalid URL)" tvg-logo="" group-title="Test",Broken Stream 2 (Invalid URL)
+https://invalid-domain-name-that-doesnt-exist-123456.com/stream.m3u8
+#EXTINF:-1 tvg-id="broken3" tvg-name="Broken Stream 3 (Malformed)" tvg-logo="" group-title="Test",Broken Stream 3 (Malformed)
+htps:/malformed-url.com/stream.m3u8
+#EXTINF:-1 tvg-id="slow" tvg-name="Slow Loading Stream (Timeout)" tvg-logo="" group-title="Test",Slow Loading Stream (Timeout)
+https://httpbin.org/delay/10/stream.m3u8
+#EXTINF:-1 tvg-id="mp4-test" tvg-name="MP4 Direct Test" tvg-logo="" group-title="Format Test",MP4 Direct Test
+http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4
+#EXTINF:-1 tvg-id="dash-test" tvg-name="DASH Test Stream" tvg-logo="" group-title="Format Test",DASH Test Stream
+https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd

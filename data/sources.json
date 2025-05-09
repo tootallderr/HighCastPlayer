@@ -1,0 +1,10 @@
+{
+  "remote": [
+    {
+      "name": "Sample IPTV List",
+      "url": "https://iptv-org.github.io/iptv/index.m3u",
+      "added": "2025-05-08T21:40:00.000Z"
+    }
+  ],
+  "local": []
+}

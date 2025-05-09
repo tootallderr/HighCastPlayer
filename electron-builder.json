@@ -1,0 +1,104 @@
+{
+  "appId": "com.iptv.player",
+  "productName": "IPTV Player",
+  "copyright": "Copyright © 2025",
+  "directories": {
+    "output": "dist",
+    "buildResources": "assets"
+  },
+  "files": [
+    "src/**/*",
+    "ui/**/*",
+    "assets/**/*",
+    "node_modules/**/*",
+    "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+    "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+    "!**/node_modules/*.d.ts",
+    "!**/node_modules/.bin",
+    "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+    "!.editorconfig",
+    "!**/._*",
+    "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+    "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+    "!**/{appveyor.yml,.travis.yml,circle.yml}",
+    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+  ],
+  "extraResources": [
+    {
+      "from": "assets",
+      "to": "assets"
+    },
+    {
+      "from": "data",
+      "to": "data"
+    }
+  ],
+  "asar": true,
+  "asarUnpack": [
+    "node_modules/ffmpeg-static/**/*"
+  ],
+  "mac": {
+    "category": "public.app-category.entertainment",
+    "target": ["dmg", "zip"],
+    "icon": "assets/icon.png",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "build/entitlements.mac.plist",
+    "entitlementsInherit": "build/entitlements.mac.plist"
+  },
+  "dmg": {
+    "background": "assets/dmg-background.png",
+    "icon": "assets/icon.png",
+    "iconSize": 100,
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ]
+  },
+  "win": {
+    "target": ["nsis"],
+    "icon": "assets/icon.png"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "IPTV Player",
+    "perMachine": false,
+    "installerIcon": "assets/icon.png",
+    "uninstallerIcon": "assets/icon.png"
+  },
+  "linux": {
+    "target": ["AppImage", "deb"],
+    "category": "Video",
+    "icon": "assets/icon.png"
+  },
+  "appImage": {
+    "systemIntegration": "ask"
+  },
+  "deb": {
+    "depends": [
+      "ffmpeg",
+      "gconf2",
+      "gconf-service",
+      "libnotify4",
+      "libappindicator1",
+      "libxtst6",
+      "libnss3"
+    ]
+  },
+  "afterPack": "./build/afterPack.js",
+  "publish": {
+    "provider": "generic",
+    "url": ""
+  }
+}
