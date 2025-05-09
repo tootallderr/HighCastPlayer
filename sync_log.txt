@@ -10,3 +10,103 @@
 2025-05-09 10:09:23,580 - INFO - Running: git remote add origin https://github.com/tootallderr/HighCastPlayer
 2025-05-09 10:09:23,642 - INFO - 🔧 Applying Git configurations...
 2025-05-09 10:09:23,881 - INFO - 🔍 Using branch: master
+2025-05-09 10:09:24,728 - WARNING - ⚠️ The following files are larger than 90MB and will be added to .gitignore:
+2025-05-09 10:09:24,728 - WARNING -    - node_modules/electron/dist/electron.exe
+2025-05-09 10:09:24,781 - ERROR - ❌ fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+2025-05-09 10:09:24,781 - INFO - ✅ Updated .gitignore with large files.
+2025-05-09 10:09:24,781 - INFO - 📦 Staging files (respecting .gitignore)...
+2025-05-09 10:09:24,781 - INFO - Running: git add .
+2025-05-09 10:09:25,096 - WARNING - ⚠️ warning: in the working copy of 'data/merged-playlist.m3u8', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'data/sources.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'setup.sh', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test-data/sample-channels.m3u8', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test-data/test-playlist.m3u8', LF will be replaced by CRLF the next time Git touches it
+2025-05-09 10:09:25,378 - ERROR - ❌ fatal: Needed a single revision
+2025-05-09 10:09:25,378 - INFO - 📝 Creating initial commit...
+2025-05-09 10:09:25,378 - INFO - Running: git commit -m "📦 Initial commit"
+2025-05-09 10:09:25,537 - INFO - [master (root-commit) 569c453] 📦 Initial commit
+ 63 files changed, 52532 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 Dockerfile
+ create mode 100644 README.md
+ create mode 100644 Roadmap.md
+ create mode 100644 assets/icon.png
+ create mode 100644 build.bat
+ create mode 100644 build.sh
+ create mode 100644 data/merged-playlist.m3u8
+ create mode 100644 data/sources.json
+ create mode 100644 docker-compose.yml
+ create mode 100644 docs/0-prerequisites.md
+ create mode 100644 docs/deployment-guide.md
+ create mode 100644 docs/dvr-features-summary.md
+ create mode 100644 docs/ui-enhancements-summary.md
+ create mode 100644 electron-builder.json
+ create mode 100644 futureV2.md
+ create mode 100644 package-lock.json
+ create mode 100644 package.json
+ create mode 100644 setup.bat
+ create mode 100644 setup.sh
+ create mode 100644 src/auto-start.js
+ create mode 100644 src/bundled-deps-check.js
+ create mode 100644 src/channel-filter.js
+ create mode 100644 src/config-manager.js
+ create mode 100644 src/dependency-check.js
+ create mode 100644 src/epg-manager.js
+ create mode 100644 src/epg-panel.js
+ create mode 100644 src/index.js
+ create mode 100644 src/metadata-overlay.js
+ create mode 100644 src/platform.js
+ create mode 100644 src/player-engine.js
+ create mode 100644 src/playlist-manager.js
+ create mode 100644 src/playlist-scheduler.js
+ create mode 100644 src/playlist-validator.js
+ create mode 100644 src/preload.js
+ create mode 100644 src/recording-scheduler.js
+ create mode 100644 src/settings-logger.js
+ create mode 100644 src/update-playlists.js
+ create mode 100644 src/updater.js
+ create mode 100644 sync_log.txt
+ create mode 100644 sync_to_github.py
+ create mode 100644 tests/README.md
+ create mode 100644 tests/analyze-errors.js
+ create mode 100644 tests/check-cross-platform.js
+ create mode 100644 tests/crash-handler.js
+ create mode 100644 tests/generate-sample-channels.js
+ create mode 100644 tests/monitor-performance.js
+ create mode 100644 tests/run-diagnostics.js
+ create mode 100644 tests/test-data/sample-channels.m3u8
+ create mode 100644 tests/test-data/test-playlist.m3u8
+ create mode 100644 tests/test-dvr-features.js
+ create mode 100644 tests/test-player-engine.js
+ create mode 100644 tests/test-playlist-manager.js
+ create mode 100644 tests/test-recording-scheduler.js
+ create mode 100644 tests/test-settings.js
+ create mode 100644 tests/test-ui-enhancements.js
+ create mode 100644 tests/utils/error-handler.js
+ create mode 100644 tests/verification.js
+ create mode 100644 tsconfig.json
+ create mode 100644 ui/index.html
+ create mode 100644 ui/schedule-recording.html
+ create mode 100644 ui/settings.html
+ create mode 100644 ui/splash.html
+2025-05-09 10:09:25,537 - INFO - ⬆️ Pushing initial commit to GitHub...
+2025-05-09 10:09:25,537 - INFO - Running: git push --set-upstream origin master
+2025-05-09 10:09:28,869 - INFO - branch 'master' set up to track 'origin/master'.
+2025-05-09 10:09:28,870 - INFO - To https://github.com/tootallderr/HighCastPlayer
+ * [new branch]      master -> master
+2025-05-09 10:09:28,870 - INFO - 
+✅ Sync to GitHub complete!
+2025-05-09 10:09:29,755 - INFO - ℹ️ 14 files/directories are being ignored by .gitignore
+2025-05-09 10:09:29,755 - INFO -    - build/
+2025-05-09 10:09:29,755 - INFO -    - node_modules/
+2025-05-09 10:09:29,755 - INFO -    - tests/diagnostic_run.log
+2025-05-09 10:09:29,755 - INFO -    - ... and 11 more
+2025-05-09 10:10:20,575 - INFO - 🚀 Starting sync process...
+
+2025-05-09 10:10:20,740 - INFO - 🧹 Cleaning up Git repository...
+2025-05-09 10:10:21,168 - INFO - 🔧 Checking for broken references...
+2025-05-09 10:10:21,258 - INFO - ✅ Remote URL is already correctly set
+2025-05-09 10:10:21,258 - INFO - 🔧 Applying Git configurations...
+2025-05-09 10:10:21,495 - INFO - 🔍 Using branch: master

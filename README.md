@@ -15,14 +15,14 @@ A cross-platform, local-only IPTV player with DVR features, multi-playlist suppo
 
 #### Windows
 ```cmd
-git clone https://github.com/yourusername/iptv-player.git
+git clone https://github.com/tootallderr/HighCastPlayer
 cd iptv-player
 setup.bat
 ```
 
 #### macOS/Linux
 ```bash
-git clone https://github.com/yourusername/iptv-player.git
+git clone https://github.com/tootallderr/HighCastPlayer
 cd iptv-player
 chmod +x setup.sh
 ./setup.sh
@@ -30,7 +30,7 @@ chmod +x setup.sh
 
 #### Docker (Optional)
 ```bash
-git clone https://github.com/yourusername/iptv-player.git
+git clone https://github.com/tootallderr/HighCastPlayer
 cd iptv-player
 docker-compose up -d
 ```
@@ -85,3 +85,33 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For more detailed information, check the `docs` folder:
 - [Prerequisites](docs/0-prerequisites.md)
 - [Troubleshooting](docs/troubleshooting.md)
+- [Deployment Guide](docs/deployment-guide.md)
+
+## 📦 Packaging and Distribution
+
+### Building Installers
+
+We provide pre-built installers for Windows, macOS, and Linux. If you want to build them yourself:
+
+#### Windows (.exe)
+```cmd
+npm run dist:win
+```
+
+#### macOS (.app/.dmg)
+```bash
+npm run dist:mac
+```
+
+#### Linux (.AppImage, .deb)
+```bash
+npm run dist:linux
+```
+
+### Features
+
+- **Offline Capability**: All dependencies are bundled, no separate installation required
+- **Auto-Start Option**: Configure the app to launch when your system starts
+- **Auto-Updates**: The application can check for and install updates automatically
+
+See the [Deployment Guide](docs/deployment-guide.md) for detailed information about packaging, signing, and distribution.
