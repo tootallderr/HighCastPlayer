@@ -936,7 +936,8 @@
                         }
                     }, 200);
                 }
-                  function clearCaptions() {
+                
+                function clearCaptions() {
                     if (captionUpdateInterval) {
                         clearInterval(captionUpdateInterval);
                         captionUpdateInterval = null;
@@ -945,11 +946,6 @@
                     const captionContainer = document.getElementById('caption-container');
                     captionContainer.textContent = '';
                     captionContainer.style.display = 'none';
-                    
-                    // Clear any applied caption classes
-                    captionContainer.className = 'caption-container';
-                    
-                    // Clear captions data
                     currentCaptions = null;
                 }
                   function toggleCaptions() {

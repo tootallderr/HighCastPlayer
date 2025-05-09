@@ -442,3 +442,41 @@ remove the file manually to continue.
 2025-05-09 12:15:59,905 - INFO - ✅ Remote URL is already correctly set
 2025-05-09 12:15:59,905 - INFO - 🔧 Applying Git configurations...
 2025-05-09 12:16:00,238 - INFO - 🔍 Using branch: master
+2025-05-09 12:16:01,100 - WARNING - ⚠️ The following files are larger than 90MB and will be added to .gitignore:
+2025-05-09 12:16:01,101 - WARNING -    - node_modules/electron/dist/electron.exe
+2025-05-09 12:16:01,173 - INFO - ✅ Updated .gitignore with large files.
+2025-05-09 12:16:01,173 - INFO - 📦 Staging files (respecting .gitignore)...
+2025-05-09 12:16:01,173 - INFO - Running: git add .
+2025-05-09 12:16:01,517 - INFO - 📝 Committing changes...
+2025-05-09 12:16:01,517 - INFO - Running: git commit -m "📝 Auto-sync on 2025-05-09 12:15:59"
+2025-05-09 12:16:01,632 - INFO - [master 90cb322] 📝 Auto-sync on 2025-05-09 12:15:59
+ 3 files changed, 73 insertions(+), 31 deletions(-)
+2025-05-09 12:16:01,999 - INFO - ✅ Remote branch 'master' exists
+2025-05-09 12:16:01,999 - INFO - ⬇️ Pulling latest changes from remote...
+2025-05-09 12:16:01,999 - INFO - Running: git pull --no-edit origin master
+2025-05-09 12:16:02,469 - INFO - Already up to date.
+2025-05-09 12:16:02,469 - INFO - From https://github.com/tootallderr/HighCastPlayer
+ * branch            master     -> FETCH_HEAD
+2025-05-09 12:16:02,470 - INFO - ⬆️ Force pushing to GitHub (overwriting remote)...
+2025-05-09 12:16:02,470 - INFO - Running: git push --force origin master
+2025-05-09 12:16:03,984 - INFO - To https://github.com/tootallderr/HighCastPlayer
+   482cdfb..90cb322  master -> master
+2025-05-09 12:16:03,984 - INFO - 
+✅ Sync to GitHub complete!
+2025-05-09 12:16:04,834 - INFO - ℹ️ 14 files/directories are being ignored by .gitignore
+2025-05-09 12:16:04,834 - INFO -    - build/
+2025-05-09 12:16:04,834 - INFO -    - node_modules/
+2025-05-09 12:16:04,834 - INFO -    - tests/diagnostic_run.log
+2025-05-09 12:16:04,834 - INFO -    - ... and 11 more
+2025-05-09 12:17:26,317 - INFO - 🚀 Starting sync process...
+
+2025-05-09 12:17:26,542 - INFO - 🧹 Cleaning up Git repository...
+2025-05-09 12:17:26,543 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\info\commit-graph: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\info\\commit-graph'
+2025-05-09 12:17:26,544 - INFO - ✅ Removed garbage file: c:\Users\GEorg\Desktop\TV\.git\objects\info\packs
+2025-05-09 12:17:26,544 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-d8973ae41970ac9fd9acaf26151440901ec59197.idx: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-d8973ae41970ac9fd9acaf26151440901ec59197.idx'
+2025-05-09 12:17:26,544 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-d8973ae41970ac9fd9acaf26151440901ec59197.pack: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-d8973ae41970ac9fd9acaf26151440901ec59197.pack'
+2025-05-09 12:17:26,545 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-d8973ae41970ac9fd9acaf26151440901ec59197.rev: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-d8973ae41970ac9fd9acaf26151440901ec59197.rev'
+2025-05-09 12:17:26,866 - INFO - 🔧 Checking for broken references...
+2025-05-09 12:17:26,988 - INFO - ✅ Remote URL is already correctly set
+2025-05-09 12:17:26,988 - INFO - 🔧 Applying Git configurations...
+2025-05-09 12:17:27,321 - INFO - 🔍 Using branch: master
