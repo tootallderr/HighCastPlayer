@@ -201,14 +201,14 @@
 
 ## 8. Packaging & Deployment
 
-* [ ] Offline-capable builds for:
+* [x] Offline-capable builds for:
 
-  * [ ] Windows `.exe`
-  * [ ] macOS `.app`
-  * [ ] Linux `.AppImage` or `.deb`
+  * [x] Windows `.exe`
+  * [x] macOS `.app`
+  * [x] Linux `.AppImage` or `.deb`
 
-* [ ] Bundle deps (no install needed)
-* [ ] Optional: Auto-start toggle
+* [x] Bundle deps (no install needed)
+* [x] Optional: Auto-start toggle
 
 **Double Check:**
 
