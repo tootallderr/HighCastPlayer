@@ -541,15 +541,34 @@ def list_remote_branches():
         return branches
     return []
 
+import threading
+
+def periodic_sync(interval_minutes=15):
+    """Run sync_to_github every interval_minutes in a background thread."""
+    def sync_loop():
+        while True:
+            try:
+                sync_result = sync_to_github()
+                if sync_result:
+                    get_gitignore_status()
+            except Exception as e:
+                logger.error(f"❌ Periodic sync error: {str(e)}")
+            sleep(interval_minutes * 60)
+    t = threading.Thread(target=sync_loop, daemon=True)
+    t.start()
+
 if __name__ == "__main__":
     try:
         # Install tqdm if needed
         try:
             from tqdm import tqdm
-            
+
+            # Start periodic sync in background
+            periodic_sync(15)
+
             # Run the sync process (moved before progress display)
             sync_result = sync_to_github()
-            
+
             # Use tqdm for visual feedback after the fact
             steps = [
                 "Prerequisites checked",
@@ -559,20 +578,27 @@ if __name__ == "__main__":
                 "Remote synced",
                 "Push completed"
             ]
-            
+
             with tqdm(steps, desc="🔄 Completed", ncols=80) as progress:
                 for _ in progress:
                     sleep(0.1)
-            
+
             # If sync was successful, show gitignore status
             if sync_result:
                 get_gitignore_status()
-            
+
+            # Keep the script alive to allow periodic sync
+            while True:
+                sleep(60)
+
         except ImportError:
             logger.warning("⚠️ tqdm not installed, running without progress bar")
+            periodic_sync(15)
             sync_result = sync_to_github()
             if sync_result:
                 get_gitignore_status()
+            while True:
+                sleep(60)
     except KeyboardInterrupt:
         logger.info("\n⚠️ Sync interrupted by user")
     except Exception as e:

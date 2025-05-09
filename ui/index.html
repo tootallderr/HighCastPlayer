@@ -824,8 +824,7 @@
                             console.error('Error loading captions:', error);
                         });
                 }
-                
-                function startCaptionMonitoring() {
+                  async function startCaptionMonitoring() {
                     // Clear any existing interval
                     if (captionUpdateInterval) {
                         clearInterval(captionUpdateInterval);
@@ -833,8 +832,37 @@
                     
                     const captionContainer = document.getElementById('caption-container');
                     
+                    // Get caption settings to apply correct styles
+                    let captionSettings;
+                    try {
+                        captionSettings = await window.api.getCaptionSettings();
+                    } catch (error) {
+                        console.error('Error getting caption settings:', error);
+                        captionSettings = {
+                            size: 'medium',
+                            position: 'bottom',
+                            font: 'sans-serif',
+                            color: '#FFFFFF',
+                            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                            aiEnhancement: {
+                                enabled: false,
+                                mode: 'standard'
+                            }
+                        };
+                    }
+                    
+                    // Apply caption styles
+                    captionContainer.style.color = captionSettings.color;
+                    captionContainer.style.backgroundColor = captionSettings.backgroundColor;
+                    
+                    // Apply classes for size, position, font
+                    captionContainer.className = 'caption-container';
+                    captionContainer.classList.add(`caption-size-${captionSettings.size}`);
+                    captionContainer.classList.add(`caption-position-${captionSettings.position}`);
+                    captionContainer.classList.add(`caption-font-${captionSettings.font}`);
+                    
                     // Check for captions every 200ms
-                    captionUpdateInterval = setInterval(() => {
+                    captionUpdateInterval = setInterval(async () => {
                         if (!videoPlayer || !currentCaptions || currentCaptions.length === 0) {
                             return;
                         }
@@ -844,25 +872,71 @@
                         
                         // Find caption for this time
                         let captionText = null;
+                        let currentCaption = null;
                         for (const caption of currentCaptions) {
                             if (currentTimeMs >= caption.start && currentTimeMs <= caption.end) {
                                 captionText = caption.text;
+                                currentCaption = caption;
                                 break;
                             }
                         }
                         
                         // Display caption
                         if (captionText) {
+                            // If AI enhancement is enabled, use it
+                            if (captionSettings.aiEnhancement && captionSettings.aiEnhancement.enabled) {
+                                // Cache key for this caption and mode
+                                const cacheKey = `${currentCaption.id}-${captionSettings.aiEnhancement.mode}`;
+                                
+                                // Check if we already have an enhanced version of this caption
+                                if (currentCaption.enhancedText && currentCaption.enhancedText[captionSettings.aiEnhancement.mode]) {
+                                    captionText = currentCaption.enhancedText[captionSettings.aiEnhancement.mode];
+                                } else {
+                                    try {
+                                        // Enhance the caption with AI
+                                        const result = await window.api.enhanceCaptionWithAI(captionText, captionSettings.aiEnhancement.mode);
+                                        if (result && result.success) {
+                                            captionText = result.text;
+                                            
+                                            // Cache the enhanced text in the caption object
+                                            if (!currentCaption.enhancedText) {
+                                                currentCaption.enhancedText = {};
+                                            }
+                                            currentCaption.enhancedText[captionSettings.aiEnhancement.mode] = captionText;
+                                        }
+                                    } catch (error) {
+                                        console.error('Error enhancing caption:', error);
+                                    }
+                                }
+                                
+                                // Add the AI mode class for styling
+                                captionContainer.classList.add(`caption-ai-${captionSettings.aiEnhancement.mode}`);
+                            } else {
+                                // Remove any AI mode classes
+                                captionContainer.classList.remove('caption-ai-standard', 'caption-ai-simplified', 'caption-ai-academic', 'caption-ai-casual');
+                            }
+                            
                             captionContainer.textContent = captionText;
                             captionContainer.style.display = 'block';
+                            
+                            // Add animation class
+                            if (!captionContainer.classList.contains('caption-fade-in')) {
+                                captionContainer.classList.add('caption-fade-in');
+                                setTimeout(() => {
+                                    captionContainer.classList.remove('caption-fade-in');
+                                }, 300);
+                            }
                         } else {
-                            captionContainer.textContent = '';
-                            captionContainer.style.display = 'none';
+                            captionContainer.classList.add('caption-fade-out');
+                            setTimeout(() => {
+                                captionContainer.textContent = '';
+                                captionContainer.style.display = 'none';
+                                captionContainer.classList.remove('caption-fade-out');
+                            }, 300);
                         }
                     }, 200);
                 }
-                
-                function clearCaptions() {
+                  function clearCaptions() {
                     if (captionUpdateInterval) {
                         clearInterval(captionUpdateInterval);
                         captionUpdateInterval = null;
@@ -871,20 +945,32 @@
                     const captionContainer = document.getElementById('caption-container');
                     captionContainer.textContent = '';
                     captionContainer.style.display = 'none';
+                    
+                    // Clear any applied caption classes
+                    captionContainer.className = 'caption-container';
+                    
+                    // Clear captions data
                     currentCaptions = null;
                 }
-                
-                function toggleCaptions() {
+                  function toggleCaptions() {
                     window.api.toggleCaptions()
                         .then(result => {
                             const captionContainer = document.getElementById('caption-container');
+                            const captionBtn = document.getElementById('caption-btn');
+                            
                             if (result.enabled) {
-                                captionContainer.style.display = currentCaptions ? 'block' : 'none';
+                                // Update caption button style
+                                captionBtn.style.color = '#0078d7';
+                                
                                 // If we have a current channel, reload captions
                                 if (currentChannel) {
                                     loadCaptionsForChannel(currentChannel.id, currentChannel.url);
                                 }
                             } else {
+                                // Update caption button style
+                                captionBtn.style.color = '';
+                                
+                                // Hide captions
                                 captionContainer.style.display = 'none';
                             }
                         })

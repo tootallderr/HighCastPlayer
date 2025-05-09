@@ -230,3 +230,75 @@ warning: in the working copy of 'tests/test-data/test-playlist.m3u8', LF will be
 2025-05-09 11:06:58,607 - INFO - ✅ Remote URL is already correctly set
 2025-05-09 11:06:58,607 - INFO - 🔧 Applying Git configurations...
 2025-05-09 11:06:58,835 - INFO - 🔍 Using branch: master
+2025-05-09 11:06:59,675 - WARNING - ⚠️ The following files are larger than 90MB and will be added to .gitignore:
+2025-05-09 11:06:59,675 - WARNING -    - node_modules/electron/dist/electron.exe
+2025-05-09 11:06:59,727 - INFO - ✅ Updated .gitignore with large files.
+2025-05-09 11:06:59,727 - INFO - 📦 Staging files (respecting .gitignore)...
+2025-05-09 11:06:59,728 - INFO - Running: git add .
+2025-05-09 11:07:00,020 - INFO - 📝 Committing changes...
+2025-05-09 11:07:00,020 - INFO - Running: git commit -m "📝 Auto-sync on 2025-05-09 11:06:58"
+2025-05-09 11:07:00,135 - INFO - [master e457f42] 📝 Auto-sync on 2025-05-09 11:06:58
+ 13 files changed, 2083 insertions(+), 265 deletions(-)
+ create mode 100644 src/caption-manager.js
+ create mode 100644 tests/test-caption-features.js
+ create mode 100644 ui/css/captions.css
+2025-05-09 11:07:00,477 - INFO - ✅ Remote branch 'master' exists
+2025-05-09 11:07:00,477 - INFO - ⬇️ Pulling latest changes from remote...
+2025-05-09 11:07:00,477 - INFO - Running: git pull --no-edit origin master
+2025-05-09 11:07:00,872 - INFO - Already up to date.
+2025-05-09 11:07:00,872 - INFO - From https://github.com/tootallderr/HighCastPlayer
+ * branch            master     -> FETCH_HEAD
+2025-05-09 11:07:00,872 - INFO - ⬆️ Force pushing to GitHub (overwriting remote)...
+2025-05-09 11:07:00,872 - INFO - Running: git push --force origin master
+2025-05-09 11:07:02,337 - INFO - To https://github.com/tootallderr/HighCastPlayer
+   1bf6f03..e457f42  master -> master
+2025-05-09 11:07:02,338 - INFO - 
+✅ Sync to GitHub complete!
+2025-05-09 11:07:02,571 - INFO - ℹ️ 14 files/directories are being ignored by .gitignore
+2025-05-09 11:07:02,572 - INFO -    - build/
+2025-05-09 11:07:02,572 - INFO -    - node_modules/
+2025-05-09 11:07:02,572 - INFO -    - tests/diagnostic_run.log
+2025-05-09 11:07:02,572 - INFO -    - ... and 11 more
+2025-05-09 11:08:33,843 - WARNING - ⚠️ tqdm not installed, running without progress bar
+2025-05-09 11:08:33,844 - INFO - 🚀 Starting sync process...
+
+2025-05-09 11:08:33,844 - INFO - 🚀 Starting sync process...
+
+2025-05-09 11:08:34,041 - INFO - 🧹 Cleaning up Git repository...
+2025-05-09 11:08:34,044 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\info\commit-graph: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\info\\commit-graph'
+2025-05-09 11:08:34,045 - INFO - ✅ Removed garbage file: c:\Users\GEorg\Desktop\TV\.git\objects\info\packs
+2025-05-09 11:08:34,045 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.idx: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.idx'
+2025-05-09 11:08:34,045 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.pack: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.pack'
+2025-05-09 11:08:34,046 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.rev: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.rev'
+2025-05-09 11:08:34,047 - INFO - 🧹 Cleaning up Git repository...
+2025-05-09 11:08:34,049 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\info\commit-graph: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\info\\commit-graph'
+2025-05-09 11:08:34,050 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.idx: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.idx'
+2025-05-09 11:08:34,050 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.pack: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.pack'
+2025-05-09 11:08:34,050 - WARNING - ⚠️ Could not remove garbage file c:\Users\GEorg\Desktop\TV\.git\objects\pack\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.rev: [WinError 5] Access is denied: 'c:\\Users\\GEorg\\Desktop\\TV\\.git\\objects\\pack\\pack-6a74a7e25f2149d9f35253cfc8fe08eac7a04288.rev'
+2025-05-09 11:08:34,102 - ERROR - ❌ fatal: gc is already running on machine 'desktop' pid 31596 (use --force if not)
+2025-05-09 11:08:34,102 - INFO - 🔧 Checking for broken references...
+2025-05-09 11:08:34,190 - INFO - ✅ Remote URL is already correctly set
+2025-05-09 11:08:34,190 - INFO - 🔧 Applying Git configurations...
+2025-05-09 11:08:34,336 - INFO - 🔧 Checking for broken references...
+2025-05-09 11:08:34,428 - INFO - ✅ Remote URL is already correctly set
+2025-05-09 11:08:34,429 - INFO - 🔧 Applying Git configurations...
+2025-05-09 11:08:34,432 - INFO - 🔍 Using branch: master
+2025-05-09 11:08:34,476 - WARNING - ⚠️ warning: unable to access '.git/config': Permission denied
+2025-05-09 11:08:34,657 - INFO - 🔍 Using branch: master
+2025-05-09 11:08:35,191 - WARNING - ⚠️ The following files are larger than 90MB and will be added to .gitignore:
+2025-05-09 11:08:35,191 - WARNING -    - node_modules/electron/dist/electron.exe
+2025-05-09 11:08:35,245 - INFO - ✅ Updated .gitignore with large files.
+2025-05-09 11:08:35,246 - INFO - 📦 Staging files (respecting .gitignore)...
+2025-05-09 11:08:35,246 - INFO - Running: git add .
+2025-05-09 11:08:35,251 - WARNING - ⚠️ The following files are larger than 90MB and will be added to .gitignore:
+2025-05-09 11:08:35,251 - WARNING -    - node_modules/electron/dist/electron.exe
+2025-05-09 11:08:35,302 - ERROR - ❌ fatal: Unable to create 'C:/Users/GEorg/Desktop/TV/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
+2025-05-09 11:08:35,302 - INFO - ✅ Updated .gitignore with large files.
+2025-05-09 11:08:35,303 - INFO - 📦 Staging files (respecting .gitignore)...
+2025-05-09 11:08:35,303 - INFO - Running: git add .
