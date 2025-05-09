@@ -11,6 +11,7 @@ const ffmpeg = require('fluent-ffmpeg');
 const { execSync } = require('child_process');
 const platform = require('./platform');
 const playlistManager = require('./playlist-manager');
+const captionManager = require('./caption-manager');
 const config = require('./config-manager');
 
 // Define paths
@@ -254,6 +255,25 @@ async function playChannel(channelId, options = {}) {
     currentPlaybackTime = 0;
     playbackQuality = { bitrate: 0, resolution: '', codec: '' };
     
+    // Try to fetch captions for this channel
+    try {
+      // This is done asynchronously to not delay playback
+      captionManager.fetchCaptions(channel.url, channel.id)
+        .then(captionsInfo => {
+          if (captionsInfo) {
+            log(`Found captions for channel ${channel.title}: ${captionsInfo.format} format`);
+          } else {
+            log(`No captions found for channel ${channel.title}`);
+          }
+        })
+        .catch(err => {
+          log(`Error fetching captions: ${err.message}`, 'error');
+        });
+    } catch (error) {
+      log(`Caption initialization error: ${error.message}`, 'warn');
+      // Continue with playback even if caption fetching fails
+    }
+    
     // Return channel info for UI
     return {
       channel: currentChannel,
@@ -416,7 +436,12 @@ async function stopPlayback() {
   isPlaying = false;
   currentPlaybackTime = 0;
   
-  return { success: true };
+  // Log any caption information, but don't disrupt playback stop
+  try {
+    log('Clearing any active captions');
+  } catch (error) {
+    log(`Error clearing captions: ${error.message}`, 'warn');
+  }
 }
 
 /**
@@ -777,7 +802,143 @@ function getChannelGroups() {
     }
   });
   
-  return Array.from(groups).sort();
+  return Array.from(groups);
+}
+
+/**
+ * Get EPG (Electronic Program Guide) data for a channel
+ * @param {string} channelId - The ID of the channel
+ */
+async function getEPG(channelId) {
+  const channel = getChannelById(channelId);
+  
+  if (!channel) {
+    throw new Error(`Channel not found: ${channelId}`);
+  }
+  
+  // TODO: Implement EPG fetching and parsing
+  log(`Fetching EPG data for channel ${channel.title}`);
+  
+  return {
+    success: true,
+    channel: channelId,
+    programs: [] // List of program objects
+  };
+}
+
+/**
+ * Get the current playback state
+ */
+function getPlaybackState() {
+  return {
+    isPlaying,
+    currentChannel: currentChannel ? {
+      id: currentChannel.id,
+      title: currentChannel.title,
+      url: currentChannel.url
+    } : null,
+    currentPlaybackTime,
+    timeShiftActive,
+    buffer: currentBuffer ? {
+      size: currentBuffer.maxSize,
+      currentPosition: currentBuffer.currentPosition,
+      segments: currentBuffer.segments.length
+    } : null,
+    playbackQuality
+  };
+}
+
+/**
+ * Get the current recording state
+ */
+function getRecordingState() {
+  return {
+    isRecording,
+    currentChannel: currentChannel ? {
+      id: currentChannel.id,
+      title: currentChannel.title
+    } : null,
+    outputPath: currentRecordingPath
+  };
+}
+
+/**
+ * Get the version of the player engine
+ */
+function getVersion() {
+  return '1.0.0';
+}
+
+/**
+ * Check for updates for the player engine
+ */
+async function checkForUpdates() {
+  // TODO: Implement update checking logic
+  log('Checking for updates');
+  
+  return {
+    success: true,
+    updateAvailable: false
+  };
+}
+
+/**
+ * Perform a software update
+ */
+async function performUpdate() {
+  // TODO: Implement update installation logic
+  log('Performing software update');
+  
+  return {
+    success: true,
+    message: 'Update installed successfully'
+  };
+}
+
+/**
+ * Reset the player engine state
+ */
+function resetState() {
+  log('Resetting player engine state');
+  
+  // Stop playback and recording
+  stopPlayback();
+  stopRecording();
+  
+  // Clear channels and buffer
+  channels = [];
+  currentChannel = null;
+  currentPlaybackTime = 0;
+  currentBuffer = null;
+  timeShiftActive = false;
+  
+  log('Player engine state reset');
+  
+  return { success: true };
+}
+
+/**
+ * Exit the player application
+ */
+function exit() {
+  log('Exiting player application');
+  
+  // Perform any necessary cleanup
+  stopPlayback();
+  stopRecording();
+  
+  log('Player application exited');
+  
+  // Exit the process
+  process.exit(0);
+}
+
+/**
+ * Get information about the currently playing channel
+ * @returns {Object|null} Current channel information or null if no channel is playing
+ */
+function getCurrentChannel() {
+  return currentChannel;
 }
 
 module.exports = {
@@ -786,14 +947,23 @@ module.exports = {
   getChannelById,
   playChannel,
   stopPlayback,
-  pausePlayback,
-  resumePlayback,
-  seekBuffer,
   startRecording,
   stopRecording,
   scheduleRecording,
+  pausePlayback,
+  resumePlayback,
+  seekBuffer,
   getPlaybackInfo,
   updatePlaybackQuality,
   filterChannels,
-  getChannelGroups
+  getChannelGroups,
+  getEPG,
+  getPlaybackState,
+  getRecordingState,
+  getVersion,
+  checkForUpdates,
+  performUpdate,
+  resetState,
+  exit,
+  getCurrentChannel
 };

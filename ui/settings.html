@@ -347,6 +347,7 @@
             <div class="tab" data-tab="player-settings">Player</div>
             <div class="tab" data-tab="recording-settings">Recording</div>
             <div class="tab" data-tab="epg-settings">EPG</div>
+            <div class="tab" data-tab="accessibility-settings">Accessibility</div>
             <div class="tab" data-tab="app-settings">Application</div>
         </div>
         
@@ -528,7 +529,139 @@
             </div>
         </div>
         
+        <div class="tab-content" id="accessibility-settings">
+            <div class="setting-group">
+                <div class="setting-group-title">Closed Caption Settings</div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Enable captions:</div>
+                    <div class="setting-control">
+                        <input type="checkbox" id="enable-captions">
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Caption size:</div>
+                    <div class="setting-control">
+                        <select id="caption-size">
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Caption color:</div>
+                    <div class="setting-control">
+                        <input type="color" id="caption-color" value="#FFFFFF">
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Caption background:</div>
+                    <div class="setting-control">
+                        <input type="color" id="caption-bg-color" value="#000000">
+                        <div class="setting-subcontrol">
+                            <label>Opacity: </label>
+                            <input type="range" id="caption-bg-opacity" min="0" max="100" value="75">
+                            <span class="unit-label">%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Caption position:</div>
+                    <div class="setting-control">
+                        <select id="caption-position">
+                            <option value="top">Top</option>
+                            <option value="middle">Middle</option>
+                            <option value="bottom">Bottom</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Caption font:</div>
+                    <div class="setting-control">
+                        <select id="caption-font">
+                            <option value="sans-serif">Sans-serif</option>
+                            <option value="serif">Serif</option>
+                            <option value="monospace">Monospace</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <div class="setting-group-title">AI Caption Enhancement</div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Enable AI enhancement:</div>
+                    <div class="setting-control">
+                        <input type="checkbox" id="enable-ai-captions">
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Enhancement mode:</div>
+                    <div class="setting-control">
+                        <select id="caption-ai-mode">
+                            <option value="standard">Standard (Verbatim)</option>
+                            <option value="simplified">Simplified</option>
+                            <option value="academic">Academic</option>
+                            <option value="casual">Casual</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Ollama endpoint:</div>
+                    <div class="setting-control">
+                        <input type="text" id="ollama-endpoint" placeholder="http://localhost:11434">
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">AI model:</div>
+                    <div class="setting-control">
+                        <input type="text" id="ollama-model" value="phi4-mini-reasoning">
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-control">
+                        <button id="test-ollama-btn">Test Ollama Connection</button>
+                        <span id="ollama-status"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button id="save-caption-settings" class="primary-button">Save Caption Settings</button>
+                <div id="caption-settings-notification" class="setting-notification"></div>
+            </div>
+        </div>
+        
         <div class="tab-content" id="app-settings">
+            <div class="setting-group">
+                <div class="setting-group-title">Application Settings</div>
+                
+                <!-- Application settings content -->
+                <div class="setting-row">
+                    <div class="setting-label">Application theme:</div>
+                    <div class="setting-control">
+                        <select id="app-theme">
+                            <option value="dark">Dark</option>
+                            <option value="light">Light</option>
+                            <option value="system">System Default</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- More settings here -->
+            </div>
+            
             <div class="setting-group">
                 <div class="setting-group-title">Startup Settings</div>
                 
@@ -1032,248 +1165,178 @@
                     }
                 }
                 
-                function createPlaylistElement(source, type, index) {
-                    const sourceEl = document.createElement('div');
-                    sourceEl.className = 'playlist-item';
-                    
-                    const nameEl = document.createElement('div');
-                    nameEl.className = 'playlist-name';
-                    nameEl.textContent = source.name;
-                    
-                    const urlEl = document.createElement('div');
-                    urlEl.className = 'playlist-url';
-                    urlEl.textContent = type === 'remote' ? source.url : source.path;
-                    
-                    const contentEl = document.createElement('div');
-                    contentEl.appendChild(nameEl);
-                    contentEl.appendChild(urlEl);
-                    
-                    const controlsEl = document.createElement('div');
-                    controlsEl.className = 'playlist-controls';
-                    
-                    const toggleLabel = document.createElement('label');
-                    toggleLabel.className = 'toggle-switch';
-                    
-                    const toggleInput = document.createElement('input');
-                    toggleInput.type = 'checkbox';
-                    toggleInput.checked = source.enabled !== false;
-                    toggleInput.addEventListener('change', async () => {
-                        try {
-                            await window.api.togglePlaylistSource({
-                                index,
-                                type,
-                                enabled: toggleInput.checked
-                            });
-                            await loadPlaylistSources();
-                        } catch (error) {
-                            console.error('Error toggling playlist:', error);
-                        }
-                    });
-                    
-                    const toggleSlider = document.createElement('span');
-                    toggleSlider.className = 'toggle-slider';
-                    
-                    toggleLabel.appendChild(toggleInput);
-                    toggleLabel.appendChild(toggleSlider);
-                    
-                    const removeBtn = document.createElement('button');
-                    removeBtn.className = 'danger';
-                    removeBtn.textContent = 'Remove';
-                    removeBtn.addEventListener('click', async () => {
-                        if (confirm('Are you sure you want to remove this playlist?')) {
-                            try {
-                                await window.api.removePlaylistSource({
-                                    index,
-                                    type
-                                });
-                                await loadPlaylistSources();
-                            } catch (error) {
-                                console.error('Error removing playlist:', error);
+                // Load caption settings
+                async function loadCaptionSettings() {
+                    try {
+                        const captionSettings = await window.api.getCaptionSettings();
+                        
+                        // Apply settings to form elements
+                        document.getElementById('enable-captions').checked = captionSettings.enabled;
+                        document.getElementById('caption-size').value = captionSettings.size;
+                        document.getElementById('caption-color').value = captionSettings.color;
+                        
+                        // Extract background color and opacity
+                        const bgColor = captionSettings.backgroundColor;
+                        if (bgColor.startsWith('rgba')) {
+                            // Parse rgba format
+                            const matches = bgColor.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/);
+                            if (matches && matches.length === 5) {
+                                const r = parseInt(matches[1], 10);
+                                const g = parseInt(matches[2], 10);
+                                const b = parseInt(matches[3], 10);
+                                const a = parseFloat(matches[4]);
+                                
+                                // Set color and opacity
+                                document.getElementById('caption-bg-color').value = rgbToHex(r, g, b);
+                                document.getElementById('caption-bg-opacity').value = Math.round(a * 100);
                             }
-                        }
-                    });
-                    
-                    controlsEl.appendChild(toggleLabel);
-                    controlsEl.appendChild(removeBtn);
-                    
-                    sourceEl.appendChild(contentEl);
-                    sourceEl.appendChild(controlsEl);
-                    
-                    return sourceEl;
-                }
-                
-                function createEpgElement(source, index) {
-                    const sourceEl = document.createElement('div');
-                    sourceEl.className = 'playlist-item';
-                    
-                    const nameEl = document.createElement('div');
-                    nameEl.className = 'playlist-name';
-                    nameEl.textContent = source.name || `EPG Source ${index + 1}`;
-                    
-                    const urlEl = document.createElement('div');
-                    urlEl.className = 'playlist-url';
-                    urlEl.textContent = source.url;
-                    
-                    const contentEl = document.createElement('div');
-                    contentEl.appendChild(nameEl);
-                    contentEl.appendChild(urlEl);
-                    
-                    const controlsEl = document.createElement('div');
-                    controlsEl.className = 'playlist-controls';
-                    
-                    const toggleLabel = document.createElement('label');
-                    toggleLabel.className = 'toggle-switch';
-                    
-                    const toggleInput = document.createElement('input');
-                    toggleInput.type = 'checkbox';
-                    toggleInput.checked = source.enabled !== false;
-                    toggleInput.addEventListener('change', async () => {
-                        try {
-                            await window.api.toggleEpgSource({
-                                url: source.url,
-                                enabled: toggleInput.checked
-                            });
-                            await loadEpgSources();
-                        } catch (error) {
-                            console.error('Error toggling EPG source:', error);
-                        }
-                    });
-                    
-                    const toggleSlider = document.createElement('span');
-                    toggleSlider.className = 'toggle-slider';
-                    
-                    toggleLabel.appendChild(toggleInput);
-                    toggleLabel.appendChild(toggleSlider);
-                    
-                    const removeBtn = document.createElement('button');
-                    removeBtn.className = 'danger';
-                    removeBtn.textContent = 'Remove';
-                    removeBtn.addEventListener('click', async () => {
-                        if (confirm('Are you sure you want to remove this EPG source?')) {
-                            try {
-                                await window.api.removeEpgSource(source.url);
-                                await loadEpgSources();
-                            } catch (error) {
-                                console.error('Error removing EPG source:', error);
-                            }
-                        }
-                    });
-                    
-                    controlsEl.appendChild(toggleLabel);
-                    controlsEl.appendChild(removeBtn);
-                    
-                    sourceEl.appendChild(contentEl);
-                    sourceEl.appendChild(controlsEl);
-                    
-                    return sourceEl;
-                }
-                
-                function showValidationMessage(message, type) {
-                    const container = document.getElementById('validation-message');
-                    container.innerHTML = '';
-                    
-                    const messageEl = document.createElement('div');
-                    messageEl.className = type;
-                    
-                    let icon = '⚠️';
-                    if (type === 'success') icon = '✅';
-                    if (type === 'validating') icon = '⏳';
-                    
-                    const iconEl = document.createElement('span');
-                    iconEl.className = 'status-icon';
-                    iconEl.textContent = icon;
-                    
-                    const textEl = document.createElement('span');
-                    textEl.textContent = message;
-                    
-                    messageEl.appendChild(iconEl);
-                    messageEl.appendChild(textEl);
-                    container.appendChild(messageEl);
-                }
-                  function clearPlaylistForm() {
-                    document.getElementById('playlist-name').value = '';
-                    document.getElementById('playlist-url').value = '';
-                    document.getElementById('playlist-file').value = '';
-                    document.getElementById('playlist-type').value = 'remote';
-                    document.getElementById('url-input-row').style.display = 'block';
-                    document.getElementById('file-input-row').style.display = 'none';
-                    document.getElementById('validation-message').innerHTML = '';
-                }
-                
-                // ---- Application Settings Tab ----
-                
-                // Auto-start handling
-                if (autoStartToggle) {
-                    // Get current auto-start status
-                    window.ipcRenderer.send('get-auto-start-status');
-                    
-                    window.ipcRenderer.on('auto-start-status', (event, data) => {
-                        autoStartToggle.checked = data.enabled;
-                    });
-                    
-                    // Handle toggle changes
-                    autoStartToggle.addEventListener('change', () => {
-                        window.ipcRenderer.send('toggle-auto-start', autoStartToggle.checked);
-                    });
-                    
-                    window.ipcRenderer.on('auto-start-toggled', (event, data) => {
-                        if (!data.success) {
-                            autoStartToggle.checked = !autoStartToggle.checked; // Revert if failed
-                            showMessage('Failed to toggle auto-start setting.', 'error');
                         } else {
-                            showMessage(`Auto-start ${data.enabled ? 'enabled' : 'disabled'} successfully.`, 'success');
+                            document.getElementById('caption-bg-color').value = captionSettings.backgroundColor;
+                            document.getElementById('caption-bg-opacity').value = 75; // Default
+                        }
+                        
+                        document.getElementById('caption-position').value = captionSettings.position;
+                        document.getElementById('caption-font').value = captionSettings.font;
+                        
+                        // AI settings
+                        document.getElementById('enable-ai-captions').checked = captionSettings.aiEnhancement.enabled;
+                        document.getElementById('caption-ai-mode').value = captionSettings.aiEnhancement.mode;
+                        document.getElementById('ollama-endpoint').value = captionSettings.aiEnhancement.ollamaEndpoint;
+                        document.getElementById('ollama-model').value = captionSettings.aiEnhancement.model;
+                        
+                    } catch (error) {
+                        console.error('Error loading caption settings:', error);
+                        showNotification('caption-settings-notification', 'Failed to load caption settings', 'error');
+                    }
+                }
+                
+                // Save caption settings
+                async function saveCaptionSettings() {
+                    try {
+                        // Get values from form elements
+                        const enabled = document.getElementById('enable-captions').checked;
+                        const size = document.getElementById('caption-size').value;
+                        const color = document.getElementById('caption-color').value;
+                        
+                        // Generate rgba background color
+                        const bgColor = document.getElementById('caption-bg-color').value;
+                        const opacity = document.getElementById('caption-bg-opacity').value / 100;
+                        const backgroundColor = hexToRgba(bgColor, opacity);
+                        
+                        const position = document.getElementById('caption-position').value;
+                        const font = document.getElementById('caption-font').value;
+                        
+                        // AI settings
+                        const aiEnabled = document.getElementById('enable-ai-captions').checked;
+                        const aiMode = document.getElementById('caption-ai-mode').value;
+                        const ollamaEndpoint = document.getElementById('ollama-endpoint').value;
+                        const ollamaModel = document.getElementById('ollama-model').value;
+                        
+                        // Create settings object
+                        const settings = {
+                            enabled,
+                            size,
+                            color,
+                            backgroundColor,
+                            position,
+                            font,
+                            aiEnhancement: {
+                                enabled: aiEnabled,
+                                mode: aiMode,
+                                ollamaEndpoint,
+                                model: ollamaModel
+                            }
+                        };
+                        
+                        // Save settings
+                        const result = await window.api.updateCaptionSettings(settings);
+                        
+                        if (result) {
+                            showNotification('caption-settings-notification', 'Caption settings saved successfully', 'success');
+                        } else {
+                            showNotification('caption-settings-notification', 'Failed to save caption settings', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error saving caption settings:', error);
+                        showNotification('caption-settings-notification', 'Failed to save caption settings', 'error');
+                    }
+                }
+                
+                // Test Ollama connection
+                async function testOllamaConnection() {
+                    try {
+                        const endpoint = document.getElementById('ollama-endpoint').value;
+                        const model = document.getElementById('ollama-model').value;
+                        
+                        const statusEl = document.getElementById('ollama-status');
+                        statusEl.textContent = 'Testing connection...';
+                        statusEl.style.color = '#ffcc00';
+                        
+                        // Create settings object with just the Ollama settings
+                        const settings = {
+                            aiEnhancement: {
+                                ollamaEndpoint: endpoint,
+                                model: model
+                            }
+                        };
+                        
+                        // Update settings and attempt connection
+                        await window.api.updateCaptionSettings(settings);
+                        
+                        // Try to enhance a simple caption as a test
+                        const result = await window.api.enhanceCaptionWithAI('This is a test caption', 'standard');
+                        
+                        if (result && result.success) {
+                            statusEl.textContent = 'Connected successfully!';
+                            statusEl.style.color = '#4CAF50';
+                        } else {
+                            statusEl.textContent = 'Connection failed';
+                            statusEl.style.color = '#f44336';
+                        }
+                    } catch (error) {
+                        const statusEl = document.getElementById('ollama-status');
+                        statusEl.textContent = `Error: ${error.message}`;
+                        statusEl.style.color = '#f44336';
+                    }
+                }
+                
+                // Helper function: Convert RGB to Hex
+                function rgbToHex(r, g, b) {
+                    return '#' + [r, g, b].map(x => {
+                        const hex = x.toString(16);
+                        return hex.length === 1 ? '0' + hex : hex;
+                    }).join('');
+                }
+                
+                // Helper function: Convert Hex to RGBA
+                function hexToRgba(hex, alpha = 1) {
+                    const r = parseInt(hex.slice(1, 3), 16);
+                    const g = parseInt(hex.slice(3, 5), 16);
+                    const b = parseInt(hex.slice(5, 7), 16);
+                    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                }
+                
+                // Save caption settings
+                document.getElementById('save-caption-settings').addEventListener('click', saveCaptionSettings);
+                
+                // Test Ollama connection
+                document.getElementById('test-ollama-btn').addEventListener('click', testOllamaConnection);
+                
+                // Load caption settings on tab change
+                const captionSettingsTab = document.querySelector('.tab[data-tab="accessibility-settings"]');
+                if (captionSettingsTab) {
+                    captionSettingsTab.addEventListener('click', loadCaptionSettings);
+                }
+                
+                            // Load selected tab content
+                            const appInfo = await window.api.getAppInfo();
+                            if (appInfo) {
+                                document.getElementById('app-version').textContent = appInfo.version || '1.0.0';
+                                document.getElementById('app-platform').textContent = appInfo.platform || '';
+                            }
+                            
+                        } catch (error) {
+                            console.error('Error initializing settings:', error);
                         }
                     });
-                }
-                
-                // Update handling
-                const checkUpdatesBtn = document.getElementById('check-for-updates-btn');
-                const updateStatus = document.getElementById('update-status');
-                // These variables are already declared above
-                const appVersion = document.getElementById('app-version');
-                const appPlatform = document.getElementById('app-platform');
-                
-                if (checkUpdatesBtn) {
-                    // Display app version and platform
-                    const versionInfo = window.ipcRenderer.sendSync('get-version-info');
-                    if (versionInfo) {
-                        appVersion.textContent = versionInfo.version || '1.0.0';
-                        appPlatform.textContent = versionInfo.platform || 'Unknown';
-                    }
-                    
-                    // Check for updates button
-                    checkUpdatesBtn.addEventListener('click', () => {
-                        updateStatus.textContent = 'Checking for updates...';
-                        updateNotificationRow.style.display = 'none';
-                        window.ipcRenderer.send('check-for-updates-manual');
-                    });
-                    
-                    // Update available notification
-                    window.ipcRenderer.on('update-available', () => {
-                        updateStatus.textContent = 'Update available! Downloading...';
-                    });
-                    
-                    // Update ready to install
-                    window.ipcRenderer.on('update-ready', () => {
-                        updateStatus.textContent = 'Update ready to install';
-                        updateNotificationRow.style.display = 'flex';
-                        updateNotificationText.textContent = 'A new version is ready to install. Restart the application to apply the update.';
-                    });
-                    
-                    // Check complete, no update
-                    window.ipcRenderer.on('update-not-available', () => {
-                        updateStatus.textContent = 'You have the latest version. Last checked: ' + new Date().toLocaleString();
-                    });
-                    
-                    // Install update button
-                    installUpdateBtn.addEventListener('click', () => {
-                        window.ipcRenderer.send('install-update');
-                    });
-                }
-            } catch (error) {
-                console.error('Error in settings UI:', error);
-            }
-        });
-    </script>
-</body>
-</html>
+                </script>

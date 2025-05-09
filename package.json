@@ -2,7 +2,8 @@
   "name": "iptv-player",
   "version": "1.0.0",
   "description": "Cross-platform, local-only IPTV player with DVR features",
-  "main": "src/index.js",  "scripts": {
+  "main": "src/index.js",
+  "scripts": {
     "start": "electron .",
     "start:dev": "electron . --dev",
     "test": "node tests/verification.js",
@@ -15,16 +16,24 @@
     "dist:mac": "electron-builder --mac",
     "dist:linux": "electron-builder --linux",
     "postinstall": "electron-builder install-app-deps"
-  },"dependencies": {
+  },
+  "dependencies": {
+    "assert-plus": "^1.0.0",
+    "electron-log": "^5.0.0",
+    "electron-updater": "^6.1.4",
     "express": "^4.18.2",
-    "fluent-ffmpeg": "^2.1.3",
     "ffmpeg-static": "^5.2.0",
+    "fluent-ffmpeg": "^2.1.3",
     "hls.js": "^1.4.12",
     "moment": "^2.30.1",
     "node-fetch": "^2.7.0",
+    "node-webvtt": "^1.9.4",
+    "node-whisper": "^2024.11.13",
+    "ollama": "^0.5.15",
     "socket.io": "^4.7.2",
-    "electron-log": "^5.0.0",
-    "electron-updater": "^6.1.4"
+    "subtitle": "^4.2.2-alpha.0",
+    "subtitles-parser": "^0.0.2",
+    "webvtt-parser": "^2.2.0"
   },
   "devDependencies": {
     "electron": "^28.0.0",

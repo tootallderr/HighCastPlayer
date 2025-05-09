@@ -261,7 +261,7 @@
 * [ ] **ML suggestion engine** (recommend channels based on view history)
 
 **Verification:**
-* [ ] Test Docker container builds and runs correctly
+* [ ] Test stream casting 
 * [ ] Test ML recommendations for accuracy
 ---
 ## ✅ Final QA & Wrap-Up

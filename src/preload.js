@@ -75,6 +75,47 @@ contextBridge.exposeInMainWorld(
       });
     },
     
+    // Caption functions
+    loadCaptions: (channelId, streamUrl) => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('captions-loaded', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('load-captions', { channelId, streamUrl });
+      });
+    },
+    
+    toggleCaptions: () => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('captions-toggled', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('toggle-captions');
+      });
+    },
+    
+    getCaptionSettings: () => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('caption-settings', (_, settings) => resolve(settings));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('get-caption-settings');
+      });
+    },
+    
+    updateCaptionSettings: (settings) => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('caption-settings-updated', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('update-caption-settings', settings);
+      });
+    },
+    
+    enhanceCaptionWithAI: (text, mode) => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('caption-enhanced', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('enhance-caption', { text, mode });
+      });
+    },
+    
     // Recording
     startRecording: (channelId) => {
       return new Promise((resolve, reject) => {

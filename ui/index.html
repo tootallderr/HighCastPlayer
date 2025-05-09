@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+<head>    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPTV Player</title>
+    <link rel="stylesheet" href="css/captions.css">
     <style>
         body, html {
             height: 100%;
@@ -147,6 +147,11 @@
             flex-direction: column;
             justify-content: flex-end;
             padding: 20px;
+        }
+        
+        /* Caption container styles */        /* Caption styles moved to captions.css */
+        #caption-container {
+            display: none;
         }
         
         .video-container:hover .video-overlay {
@@ -641,6 +646,7 @@
         <div class="player-container">
             <div class="video-container">
                 <video id="video-player"></video>
+                <div id="caption-container" style="display: none;"></div>
                 
                 <div class="video-overlay">                    <div class="channel-info">
                         <img class="channel-info-logo" id="channel-logo" src="../assets/icon.png" alt="Channel logo">
@@ -667,6 +673,7 @@
                                 <label for="volume-slider" class="sr-only">Volume</label>
                                 <input type="range" min="0" max="100" value="100" class="volume-slider" id="volume-slider" title="Volume Control">
                             </div>
+                            <button class="control-button" id="caption-btn" title="Toggle Closed Captions">CC</button>
                             <button class="control-button" id="fullscreen-btn">⛶</button>
                         </div>
                     </div>                </div>
@@ -738,6 +745,7 @@
                 const stopBtn = document.getElementById('stop-btn');
                 const recordBtn = document.getElementById('record-btn');
                 const muteBtn = document.getElementById('mute-btn');
+                const captionBtn = document.getElementById('caption-btn');
                 const volumeSlider = document.getElementById('volume-slider');
                 const fullscreenBtn = document.getElementById('fullscreen-btn');
                 const progressBar = document.getElementById('progress-bar');
@@ -791,6 +799,98 @@
                     const m = Math.floor((seconds % 3600) / 60);
                     const s = Math.floor(seconds % 60);
                     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }
+                
+                // Caption handling functions
+                let captionUpdateInterval = null;
+                let currentCaptions = null;
+                
+                function loadCaptionsForChannel(channelId, streamUrl) {
+                    // Clear any existing captions
+                    clearCaptions();
+                    
+                    // Call the API to load captions for this channel
+                    window.api.loadCaptions(channelId, streamUrl)
+                        .then(result => {
+                            if (result && result.success) {
+                                console.log('Captions loaded successfully');
+                                currentCaptions = result.captions;
+                                
+                                // Start monitoring video time to display captions
+                                startCaptionMonitoring();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading captions:', error);
+                        });
+                }
+                
+                function startCaptionMonitoring() {
+                    // Clear any existing interval
+                    if (captionUpdateInterval) {
+                        clearInterval(captionUpdateInterval);
+                    }
+                    
+                    const captionContainer = document.getElementById('caption-container');
+                    
+                    // Check for captions every 200ms
+                    captionUpdateInterval = setInterval(() => {
+                        if (!videoPlayer || !currentCaptions || currentCaptions.length === 0) {
+                            return;
+                        }
+                        
+                        // Get current video time in milliseconds
+                        const currentTimeMs = videoPlayer.currentTime * 1000;
+                        
+                        // Find caption for this time
+                        let captionText = null;
+                        for (const caption of currentCaptions) {
+                            if (currentTimeMs >= caption.start && currentTimeMs <= caption.end) {
+                                captionText = caption.text;
+                                break;
+                            }
+                        }
+                        
+                        // Display caption
+                        if (captionText) {
+                            captionContainer.textContent = captionText;
+                            captionContainer.style.display = 'block';
+                        } else {
+                            captionContainer.textContent = '';
+                            captionContainer.style.display = 'none';
+                        }
+                    }, 200);
+                }
+                
+                function clearCaptions() {
+                    if (captionUpdateInterval) {
+                        clearInterval(captionUpdateInterval);
+                        captionUpdateInterval = null;
+                    }
+                    
+                    const captionContainer = document.getElementById('caption-container');
+                    captionContainer.textContent = '';
+                    captionContainer.style.display = 'none';
+                    currentCaptions = null;
+                }
+                
+                function toggleCaptions() {
+                    window.api.toggleCaptions()
+                        .then(result => {
+                            const captionContainer = document.getElementById('caption-container');
+                            if (result.enabled) {
+                                captionContainer.style.display = currentCaptions ? 'block' : 'none';
+                                // If we have a current channel, reload captions
+                                if (currentChannel) {
+                                    loadCaptionsForChannel(currentChannel.id, currentChannel.url);
+                                }
+                            } else {
+                                captionContainer.style.display = 'none';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error toggling captions:', error);
+                        });
                 }
                 
                 function updatePlaybackTime() {
@@ -857,6 +957,9 @@
                                                 
                                                 // Setup metadata updater
                                                 setupMetadataUpdater();
+                                                
+                                                // Try to load captions for this channel
+                                                loadCaptionsForChannel(channel.id, result.streamUrl);
                                             })
                                             .catch(error => {
                                                 console.error('Error playing video:', error);
@@ -1562,6 +1665,35 @@
                     };
                     document.head.appendChild(script);
                 }
+                
+                // Event listeners for the player controls
+                playPauseBtn.addEventListener('click', togglePlay);
+                stopBtn.addEventListener('click', stopPlayer);
+                recordBtn.addEventListener('click', toggleRecording);
+                muteBtn.addEventListener('click', toggleMute);
+                volumeSlider.addEventListener('input', () => {
+                    videoPlayer.volume = volumeSlider.value / 100;
+                    if (volumeSlider.value === '0') {
+                        isMuted = true;
+                        muteBtn.textContent = '🔇';
+                    } else {
+                        isMuted = false;
+                        muteBtn.textContent = '🔊';
+                    }
+                });
+                captionBtn.addEventListener('click', toggleCaptions);
+                fullscreenBtn.addEventListener('click', toggleFullscreen);
+                
+                // Rewind and forward buttons
+                document.getElementById('rewind-btn').addEventListener('click', () => seekBackward(10));
+                document.getElementById('forward-btn').addEventListener('click', () => seekForward(10));
+                
+                // Error retry button
+                errorRetry.addEventListener('click', () => {
+                    if (currentChannel) {
+                        playChannel(currentChannel);
+                    }
+                });
             } catch (error) {
                 console.error('Initialization error:', error);
             }

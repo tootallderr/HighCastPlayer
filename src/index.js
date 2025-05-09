@@ -14,6 +14,7 @@ const playlistManager = require('./playlist-manager');
 const playerEngine = require('./player-engine');
 const recordingScheduler = require('./recording-scheduler');
 const epgManager = require('./epg-manager');
+const captionManager = require('./caption-manager');
 const config = require('./config-manager');
 const updater = require('./updater');
 const autoStart = require('./auto-start');
@@ -790,6 +791,61 @@ ipcMain.on('seek-playback', (event, seconds) => {
   }
 });
 
+// Caption events
+ipcMain.on('load-captions', async (event, { channelId, streamUrl }) => {
+  try {
+    const captionsInfo = await captionManager.fetchCaptions(streamUrl, channelId);
+    if (captionsInfo) {
+      const captions = await captionManager.loadCaptions(captionsInfo);
+      event.reply('captions-loaded', { success: true, captions });
+    } else {
+      event.reply('captions-loaded', { success: false, error: 'No captions available' });
+    }
+  } catch (error) {
+    event.reply('error', { component: 'captions', message: error.message });
+  }
+});
+
+ipcMain.on('toggle-captions', (event) => {
+  try {
+    const settings = captionManager.settings;
+    settings.enabled = !settings.enabled;
+    const result = captionManager.updateSettings(settings);
+    event.reply('captions-toggled', { enabled: settings.enabled, ...result });
+  } catch (error) {
+    event.reply('error', { component: 'captions', message: error.message });
+  }
+});
+
+ipcMain.on('get-caption-settings', (event) => {
+  try {
+    const settings = captionManager.settings;
+    event.reply('caption-settings', settings);
+  } catch (error) {
+    event.reply('error', { component: 'captions', message: error.message });
+  }
+});
+
+ipcMain.on('update-caption-settings', (event, settings) => {
+  try {
+    const result = captionManager.updateSettings(settings);
+    event.reply('caption-settings-updated', result);
+  } catch (error) {
+    event.reply('error', { component: 'captions', message: error.message });
+  }
+});
+
+ipcMain.on('enhance-caption', async (event, { text, mode }) => {
+  try {
+    const enhancedText = await captionManager.enhanceCaptionWithAI(text, mode);
+    event.reply('caption-enhanced', { success: true, text: enhancedText });
+  } catch (error) {
+    event.reply('error', { component: 'captions', message: error.message });
+    // Return the original text as a fallback
+    event.reply('caption-enhanced', { success: false, text });
+  }
+});
+
 // Playback info event - for metadata overlay
 ipcMain.on('get-playback-info', async (event) => {
   try {
@@ -977,4 +1033,59 @@ ipcMain.on('get-version-info', (event) => {
     electronVersion: process.versions.electron,
     nodeVersion: process.versions.node
   };
+});
+
+// Caption events
+ipcMain.on('get-captions', async (event) => {
+  try {
+    const captions = await captionManager.getAllCaptions();
+    event.reply('captions-loaded', captions);
+  } catch (error) {
+    event.reply('error', { component: 'caption', message: error.message });
+  }
+});
+
+ipcMain.on('add-caption', async (event, { url, language }) => {
+  try {
+    const result = await captionManager.addCaption(url, language);
+    event.reply('caption-added', result);
+  } catch (error) {
+    event.reply('error', { component: 'caption', message: error.message });
+  }
+});
+
+ipcMain.on('remove-caption', async (event, id) => {
+  try {
+    const result = await captionManager.removeCaption(id);
+    event.reply('caption-removed', result);
+  } catch (error) {
+    event.reply('error', { component: 'caption', message: error.message });
+  }
+});
+
+ipcMain.on('update-caption', async (event, { id, url, language }) => {
+  try {
+    const result = await captionManager.updateCaption(id, url, language);
+    event.reply('caption-updated', result);
+  } catch (error) {
+    event.reply('error', { component: 'caption', message: error.message });
+  }
+});
+
+ipcMain.on('get-active-captions', (event) => {
+  try {
+    const activeCaptions = captionManager.getActiveCaptions();
+    event.reply('active-captions', activeCaptions);
+  } catch (error) {
+    event.reply('error', { component: 'caption', message: error.message });
+  }
+});
+
+ipcMain.on('set-active-captions', (event, captionIds) => {
+  try {
+    captionManager.setActiveCaptions(captionIds);
+    event.reply('active-captions-set');
+  } catch (error) {
+    event.reply('error', { component: 'caption', message: error.message });
+  }
 });
