@@ -110,14 +110,13 @@ async function runTests() {
           const recordResult = await playerEngine.startRecording(channel.id);
           log(`Recording started: ${channel.title} to ${path.basename(recordResult.outputPath)}`);
           log(`Recording start result: ${recordResult ? 'PASSED ✅' : 'FAILED ❌'}`);
-          
-          // Record for a few seconds
+            // Record for a few seconds
           log('Recording for 5 seconds...');
           await new Promise(resolve => setTimeout(resolve, 5000));
           
           // Stop recording
           const stopResult = await playerEngine.stopRecording();
-          log(`Recording stop result: ${stopResult.success ? 'PASSED ✅' : 'FAILED ❌'}`);
+          log(`Recording stop result: ${stopResult.success ? 'PASSED ✅' : 'FAILED ❌'}${stopResult.timedOut ? ' (timed out)' : ''}`);
           
           if (stopResult.success) {
             log(`Recorded file: ${stopResult.outputPath}`);

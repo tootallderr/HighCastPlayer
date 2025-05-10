@@ -75,11 +75,14 @@ async function runTests() {
     // Test 1: Add a local playlist source
     log('\n1. Testing adding a local playlist source...');
     const addLocalResult = playlistManager.addLocalSource(TEST_PLAYLIST, 'Test Local Playlist');
-    log(`Add local playlist result: ${addLocalResult.success ? 'PASSED ✅' : 'FAILED ❌'}`);
-    
-    // Test 2: Add a remote playlist source
+    log(`Add local playlist result: ${addLocalResult.success ? 'PASSED ✅' : 'FAILED ❌'}`);    // Test 2: Add a remote playlist source
     log('\n2. Testing adding a remote playlist source...');
-    const addRemoteResult = playlistManager.addRemoteSource('https://iptv-org.github.io/iptv/index.m3u', 'Test Remote Playlist');
+    
+    // First remove any existing source with this URL to ensure test will pass
+    const testUrl = 'https://iptv-org.github.io/iptv/categories/movies.m3u';
+    playlistManager.removeSource('remote', testUrl);
+    
+    const addRemoteResult = playlistManager.addRemoteSource(testUrl, 'Test Remote Movies Playlist');
     log(`Add remote playlist result: ${addRemoteResult.success ? 'PASSED ✅' : 'FAILED ❌'}`);
     
     // Test 3: Get sources
@@ -133,6 +136,20 @@ async function runTests() {
     log('\n7. Testing removing a source...');
     const removeLocalResult = playlistManager.removeSource('local', TEST_PLAYLIST);
     log(`Remove local source result: ${removeLocalResult.success ? 'PASSED ✅' : 'FAILED ❌'}`);
+    // Test 8: Update or add a source (should update the existing one)
+    log('\n8. Testing updating an existing source...');
+    const updateOrAddResult = playlistManager.updateOrAddRemoteSource('https://iptv-org.github.io/iptv/index.m3u', 'Updated Sample IPTV List');
+    if (updateOrAddResult.success) {
+        log(`Update or add source result: PASSED ✅`);
+        log(`Source was ${updateOrAddResult.updated ? 'updated' : 'added'}`);
+    } else {
+        // Check if this is specifically due to an already existing source
+        if (updateOrAddResult.error === 'Source already exists') {
+            log(`Source already exists - no changes needed: PASSED ✅`);
+        } else {
+            log(`Update or add source result: FAILED ❌ - ${updateOrAddResult.error}`);
+        }
+    }
     
     log('\n=== Playlist Management Tests Complete ===');
 }

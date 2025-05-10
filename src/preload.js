@@ -3,21 +3,92 @@
  * 
  * This script runs in the renderer process before the web page loads.
  * It provides safe access to node modules and IPC for the renderer process.
+ * 
+ * This script can run in three different environments:
+ * 1. Main Electron process - will handle IPC normally
+ * 2. Renderer process - will communicate via contextBridge
+ * 3. Direct Node.js execution - will provide mock objects
  */
 
-const { ipcRenderer, contextBridge } = require('electron');
 const path = require('path');
 const os = require('os');
+const fs = require('fs');
+let ipcRenderer, contextBridge, app;
 
-// Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
-contextBridge.exposeInMainWorld(
+// Determine execution environment and set up accordingly
+function initializeEnvironment() {
+  try {
+    const electron = require('electron');
+    
+    // Check if we're in the main process or renderer process
+    if (process.type === 'renderer') {
+      // Renderer process
+      ipcRenderer = electron.ipcRenderer;
+      contextBridge = electron.contextBridge;
+      console.log('Running in Electron renderer process');
+    } else {
+      // Main process
+      app = electron.app || electron.remote?.app;
+      // Create mock objects for main process
+      ipcRenderer = { 
+        on: (channel, callback) => console.log(`Would register for ${channel} events`),
+        once: (channel, callback) => console.log(`Would register once for ${channel} events`),
+        send: (channel, ...args) => console.log(`Would send to ${channel} with args:`, ...args)
+      };
+      contextBridge = { 
+        exposeInMainWorld: (name, api) => console.log(`Would expose ${name} API to renderer`)
+      };
+      console.log('Running in Electron main process');
+    }
+  } catch (error) {
+    console.warn('Not running in Electron environment, IPC will be unavailable');
+    // Create mock objects for when running directly with Node.js
+    ipcRenderer = { 
+      on: () => {}, 
+      once: () => {}, 
+      send: () => {} 
+    };
+    contextBridge = { 
+      exposeInMainWorld: () => {} 
+    };
+    
+    // Log to a file to help with diagnostics when running outside Electron
+    try {
+      const logPath = path.join(__dirname, '..', 'logs');
+      if (!fs.existsSync(logPath)) {
+        fs.mkdirSync(logPath, { recursive: true });
+      }
+      fs.appendFileSync(
+        path.join(logPath, 'preload-standalone.log'),
+        `[${new Date().toISOString()}] Preload script executed outside Electron: ${error.message}\n`
+      );
+    } catch (logError) {
+      // Silently fail if logging fails
+    }
+  }
+}
+
+// Initialize when the module is loaded
+initializeEnvironment();
+
+// Only expose to renderer if in Electron environment
+if (contextBridge && contextBridge.exposeInMainWorld) {
+  // Expose protected methods that allow the renderer process to use
+  // the ipcRenderer without exposing the entire object
+  contextBridge.exposeInMainWorld(
   'api', {
     // Channel navigation
     getChannels: () => {
-      return new Promise((resolve, reject) => {
-        ipcRenderer.once('channels-loaded', (_, channels) => resolve(channels));
-        ipcRenderer.once('error', (_, error) => reject(error));
+      return new Promise((resolve) => {
+        ipcRenderer.once('channels-loaded', (_, channels) => {
+          console.log('[Preload getChannels] Received channels-loaded:', channels ? channels.length : 'null/undefined');
+          resolve(channels || []);
+        });
+        ipcRenderer.once('error', (_, error) => {
+          console.error('[Preload getChannels] Received error:', error);
+          resolve([]);
+        });
+        console.log('[Preload getChannels] Sending load-channels IPC message.');
         ipcRenderer.send('load-channels');
       });
     },
@@ -113,6 +184,88 @@ contextBridge.exposeInMainWorld(
         ipcRenderer.once('caption-enhanced', (_, result) => resolve(result));
         ipcRenderer.once('error', (_, error) => reject(error));
         ipcRenderer.send('enhance-caption', { text, mode });
+      });
+    },
+    
+    // Casting
+    getCastingDevices: () => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('casting-devices', (_, devices) => resolve(devices));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('get-casting-devices');
+      });
+    },
+    
+    refreshCastingDevices: () => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('casting-devices-refreshed', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('refresh-casting-devices');
+      });
+    },
+    
+    castMedia: (deviceId, media) => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('media-cast', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('cast-media', { deviceId, media });
+      });
+    },
+    
+    stopCasting: () => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('casting-stopped', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('stop-casting');
+      });
+    },
+    
+    controlCasting: (action, options) => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('casting-controlled', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('control-casting', { action, options });
+      });
+    },
+    
+    getCastingStatus: () => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('casting-status', (_, status) => resolve(status));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('get-casting-status');
+      });
+    },
+    
+    // Recommendations
+    getRecommendations: (currentChannelId = null) => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('recommendations', (_, recommendations) => resolve(recommendations));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('get-recommendations', { currentChannelId });
+      });
+    },
+    
+    getViewingHistory: (limit = null) => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('viewing-history', (_, history) => resolve(history));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('get-viewing-history', { limit });
+      });
+    },
+    
+    getTopWatchedChannels: (limit = 10) => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('top-watched-channels', (_, channels) => resolve(channels));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('get-top-watched-channels', { limit });
+      });
+    },
+    
+    clearViewingHistory: () => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('viewing-history-cleared', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('clear-viewing-history');
       });
     },
     
@@ -242,11 +395,14 @@ contextBridge.exposeInMainWorld(
         ipcRenderer.send('cancel-scheduled-recording', recordingId);
       });
     },
-    
-    getScheduledRecordings: () => {
+      getScheduledRecordings: () => {
       return new Promise((resolve, reject) => {
-        ipcRenderer.once('scheduled-recordings', (_, recordings) => resolve(recordings));
-        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.once('scheduled-recordings', (_, recordings) => resolve(recordings || []));
+        ipcRenderer.once('error', (_, error) => {
+          console.error('Error getting scheduled recordings:', error);
+          // Return empty array instead of rejecting to make the UI more resilient
+          resolve([]);
+        });
         ipcRenderer.send('get-scheduled-recordings');
       });
     },
@@ -381,12 +537,34 @@ contextBridge.exposeInMainWorld(
         'start-recording',
         'stop-recording',
         'schedule-recording',
-        'error'
+        'error',
+        'playlists-updated'
       ];
       if (validChannels.includes(channel)) {
         // Deliberately strip event as it includes `sender` 
         ipcRenderer.on(channel, (event, ...args) => callback(...args));
+        return () => ipcRenderer.removeListener(channel, callback);
       }
+    },
+    
+    // Playlist update notifications
+    onPlaylistsUpdated: (callback) => {
+      ipcRenderer.on('playlists-updated', (event, ...args) => callback(...args));
+      return () => ipcRenderer.removeListener('playlists-updated', callback);
+    },
+    
+    // Add playlist dialog
+    showAddPlaylistDialog: () => {
+      ipcRenderer.send('show-add-playlist-dialog');
+    },
+    
+    // Manual update playlists
+    updatePlaylists: () => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('playlists-updated', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('update-playlists');
+      });
     },
     
     // System information
@@ -399,6 +577,77 @@ contextBridge.exposeInMainWorld(
         homedir: os.homedir(),
         userDataPath: path.join(os.homedir(), '.iptv-player')
       };
-    }
+    },
+    
+    // Modernization Settings
+    getModernizationSettings: () => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('modernization-settings', (_, settings) => resolve(settings));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('get-modernization-settings');
+      });
+    },
+    
+    saveModernizationSettings: (settings) => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('modernization-settings-saved', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('save-modernization-settings', settings);
+      });
+    },
+    
+    testCasting: () => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('casting-test-result', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('test-casting');
+      });
+    },
+    
+    clearCastingCache: () => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.once('casting-cache-cleared', (_, result) => resolve(result));
+        ipcRenderer.once('error', (_, error) => reject(error));
+        ipcRenderer.send('clear-casting-cache');
+      });
+    },
+
+    // Status message notifications
+    onStatusMessage: (callback) => {
+      ipcRenderer.on('status-message', (event, ...args) => callback(...args));
+      return () => ipcRenderer.removeListener('status-message', callback);
+    },
+    
+    // Other APIs...
   }
 );
+}
+
+// If this file is run directly (not through Electron), provide a helpful message
+if (require.main === module) {
+  console.log('IPTV Player Preload Script');
+  console.log('This script is meant to be loaded by Electron, not run directly.');
+  console.log('To start the application, use:');
+  console.log('  - In development: npm start');
+  console.log('  - In production: Run the packaged application');
+  
+  // If run directly, perform a self-test to check module functionality
+  console.log('\nPerforming self-test...');
+  
+  // Test path functions
+  console.log('- Path resolution: ' + (path.isAbsolute(__dirname) ? 'Working ✅' : 'Not working ❌'));
+  
+  // Test OS functions
+  console.log('- OS detection: ' + (os.platform() ? 'Working ✅' : 'Not working ❌'));
+  
+  // Try to find the Electron modules
+  try {
+    const electron = require('electron');
+    console.log('- Electron modules: Available ✅');
+  } catch (error) {
+    console.log('- Electron modules: Not available ❌');
+  }
+  
+  console.log('\nSelf-test complete. If any checks failed, the script may not work properly.');
+  console.log('This utility will exit now.');
+}

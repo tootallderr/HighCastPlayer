@@ -1,0 +1,29 @@
+[2025-05-09T22:50:10.628Z] [INFO] === IPTV Player Settings Test ===
+[2025-05-09T22:50:10.629Z] [INFO] 
+1. Testing settings loading...
+[2025-05-09T22:50:10.629Z] [INFO] Settings object structure check: PASSED ✅
+[2025-05-09T22:50:10.630Z] [INFO] Settings properties: player, playlists, recordings, ui, captions
+[2025-05-09T22:50:10.630Z] [INFO] Settings file exists: PASSED ✅
+[2025-05-09T22:50:10.631Z] [INFO] Settings JSON structure is valid: PASSED ✅
+[2025-05-09T22:50:10.631Z] [INFO] 
+2. Testing settings modification...
+[2025-05-09T22:50:10.632Z] [INFO] Settings update result: PASSED ✅
+[2025-05-09T22:50:10.632Z] [INFO] Settings updated correctly: PASSED ✅
+[2025-05-09T22:50:10.633Z] [INFO] Restored buffer length to original value: 30
+[2025-05-09T22:50:10.633Z] [INFO] 
+3. Testing playlist sources file...
+[2025-05-09T22:50:10.634Z] [INFO] Sources file exists: PASSED ✅
+[2025-05-09T22:50:10.634Z] [INFO] Sources object structure check: PASSED ✅
+[2025-05-09T22:50:10.635Z] [INFO] 
+4. Testing playlist validation...
+[2025-05-09T22:50:10.998Z] [INFO] Local playlist validation: PASSED ✅
+[2025-05-09T22:50:10.998Z] [INFO] Channels found: 2
+[2025-05-09T22:50:10.999Z] [INFO] Invalid file validation correctly failed: PASSED ✅
+[2025-05-09T22:50:10.999Z] [INFO] 
+5. Testing settings and sources logs...
+[2025-05-09T22:50:11.000Z] [INFO] Settings log exists: FAILED ❌
+[2025-05-09T22:50:11.000Z] [INFO] Sources log exists: FAILED ❌
+[2025-05-09T22:50:11.001Z] [INFO] Created a test settings log entry
+[2025-05-09T22:50:11.002Z] [INFO] Created a test sources log entry
+[2025-05-09T22:50:11.002Z] [INFO] 
+=== Settings Tests Complete ===

@@ -15,7 +15,8 @@ const config = require('./config-manager');
 // Define paths
 const DATA_DIR = platform.getAppDataPath();
 const SCHEDULE_FILE = path.join(DATA_DIR, 'recording-schedule.json');
-const LOG_FILE = path.join(__dirname, '..', 'tests', 'recording.log');
+const LOGS_DIR = path.join(DATA_DIR, 'logs');
+const LOG_FILE = path.join(LOGS_DIR, 'recording.log');
 
 // Initialize event emitter
 const emitter = new EventEmitter();
@@ -26,14 +27,14 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 // Ensure log directory exists
-const logDir = path.dirname(LOG_FILE);
-if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir, { recursive: true });
+if (!fs.existsSync(LOGS_DIR)) {
+    fs.mkdirSync(LOGS_DIR, { recursive: true });
 }
 
 // Scheduler state
 let scheduledRecordings = [];
 let activeTimers = {};
+let isInitialized = false;
 
 /**
  * Logger function for recording events
@@ -42,8 +43,13 @@ function log(message, level = 'info') {
     const timestamp = new Date().toISOString();
     const formattedMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}\n`;
     
-    // Append to log file
-    fs.appendFileSync(LOG_FILE, formattedMessage);
+    try {
+        // Append to log file
+        fs.appendFileSync(LOG_FILE, formattedMessage);
+    } catch (error) {
+        // Silently handle logging errors
+        console.error(`[Scheduler] Error writing to log: ${error.message}`);
+    }
     
     // Also output to console if not in production
     if (process.env.NODE_ENV !== 'production') {
@@ -340,6 +346,9 @@ function initialize() {
         setupRecordingTimer(recording);
     });
     
+    // Mark as initialized
+    isInitialized = true;
+    
     log('Recording scheduler initialized');
     
     return { success: true };
@@ -370,5 +379,6 @@ module.exports = {
     getAllScheduledRecordings,
     getRecordingsByStatus,
     on: (event, listener) => emitter.on(event, listener),
-    off: (event, listener) => emitter.off(event, listener)
+    off: (event, listener) => emitter.off(event, listener),
+    get isInitialized() { return isInitialized; }
 };

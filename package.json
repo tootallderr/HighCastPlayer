@@ -19,6 +19,8 @@
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
+    "axios": "^1.9.0",
+    "chromecast-api": "^0.4.2",
     "electron-log": "^5.0.0",
     "electron-updater": "^6.1.4",
     "express": "^4.18.2",
@@ -27,13 +29,17 @@
     "hls.js": "^1.4.12",
     "moment": "^2.30.1",
     "node-fetch": "^2.7.0",
+    "node-ssdp": "^4.0.1",
+    "node-upnp-client": "^0.0.2",
     "node-webvtt": "^1.9.4",
     "node-whisper": "^2024.11.13",
     "ollama": "^0.5.15",
     "socket.io": "^4.7.2",
     "subtitle": "^4.2.2-alpha.0",
     "subtitles-parser": "^0.0.2",
-    "webvtt-parser": "^2.2.0"
+    "upnp-client": "^0.0.1",
+    "webvtt-parser": "^2.2.0",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "electron": "^28.0.0",

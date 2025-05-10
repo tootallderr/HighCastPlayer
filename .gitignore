@@ -1,59 +1,52 @@
-# Node modules and dependencies
-node_modules/
-npm-debug.log
-yarn-error.log
-yarn-debug.log
-.pnpm-debug.log
-
-# Build outputs
-dist/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 build/
-out/
-.next/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Environment variables
+# Environments
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
+# Logs
+*.log
+sync_log.txt
 
-# Editor directories and files
+# IDE files
 .idea/
 .vscode/
 *.swp
 *.swo
-*~
 
-# Debug logs
-logs/
-*.log
+# OS specific
+.DS_Store
+Thumbs.db
 
-# Coverage directory used by tools like istanbul
-coverage/
-
-# Dependency directories
-jspm_packages/
-bower_components/
-
-# Optional npm cache directory
-.npm/
-
-# Optional eslint cache
-.eslintcache
-node_modules/electron/dist/electron.exe
-node_modules/electron/dist/electron.exe
-node_modules/electron/dist/electron.exe
-node_modules/electron/dist/electron.exe
-node_modules/electron/dist/electron.exe
-node_modules/electron/dist/electron.exe
-node_modules/electron/dist/electron.exe
-node_modules/electron/dist/electron.exe
-node_modules/electron/dist/electron.exe
-node_modules/electron/dist/electron.exe
+# Project specific
+backend/data/temp/
+backend/data/cache/
+node_modules/
+package-lock.json
 node_modules/electron/dist/electron.exe

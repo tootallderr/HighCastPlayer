@@ -1,0 +1,57 @@
+{
+  "appId": "com.iptv.player",
+  "productName": "IPTV Player",
+  "copyright": "Copyright © 2025",
+  "directories": {
+    "output": "build-output"
+  },
+  "files": [
+    "src/**/*",
+    "ui/**/*",
+    "assets/**/*",
+    "node_modules/**/*",
+    "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+    "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+    "!**/node_modules/*.d.ts",
+    "!**/node_modules/.bin",
+    "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+    "!.editorconfig",
+    "!**/._*",
+    "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+    "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+    "!**/{appveyor.yml,.travis.yml,circle.yml}",
+    "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+  ],
+  "extraResources": [
+    {
+      "from": "assets",
+      "to": "assets"
+    },
+    {
+      "from": "data",
+      "to": "data"
+    }
+  ],
+  "asar": true,
+  "asarUnpack": [
+    "node_modules/ffmpeg-static/**/*"
+  ],
+  "win": {
+    "target": ["nsis"],
+    "icon": "assets/icon.png",
+    "certificateFile": null,
+    "publisherName": null,
+    "verifyUpdateCodeSignature": false,
+    "signDlls": false
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "IPTV Player",
+    "perMachine": false,
+    "installerIcon": "assets/icon.png",
+    "uninstallerIcon": "assets/icon.png"
+  }
+}

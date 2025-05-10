@@ -1,0 +1,34 @@
+[2025-05-09T22:48:50.788Z] [INFO] Starting UI Enhancements Tests
+[2025-05-09T22:48:50.789Z] [INFO] Testing EPG functionality
+[2025-05-09T22:48:50.791Z] [INFO] EPG initialization successful
+[2025-05-09T22:48:50.792Z] [WARN] Test EPG source already exists
+[2025-05-09T22:48:50.793Z] [INFO] Loaded EPG config with 1 sources
+[2025-05-09T22:48:50.793Z] [INFO] EPG functionality tests passed
+[2025-05-09T22:48:50.794Z] [INFO] Testing channel search and filter
+[2025-05-09T22:48:50.899Z] [INFO] Found 10960 total channels
+[2025-05-09T22:48:50.904Z] [INFO] Found 795 channels matching 'news' query
+[2025-05-09T22:48:50.906Z] [INFO] Found 127 channel groups
+[2025-05-09T22:48:50.908Z] [INFO] Found 3853 channels in group "Undefined"
+[2025-05-09T22:48:50.908Z] [INFO] Channel search and filter tests passed
+[2025-05-09T22:48:50.908Z] [INFO] Testing metadata overlay
+[2025-05-09T22:48:51.011Z] [INFO] Properly handled metadata request with no active channel
+[2025-05-09T22:48:51.012Z] [INFO] Note: Full metadata overlay testing requires manual verification during playback
+[2025-05-09T22:48:51.012Z] [INFO] Metadata overlay tests completed
+[2025-05-09T22:48:51.013Z] [INFO] All UI enhancement tests completed successfully
+[2025-05-09T22:50:05.563Z] [INFO] Starting UI Enhancements Tests
+[2025-05-09T22:50:05.563Z] [INFO] Testing EPG functionality
+[2025-05-09T22:50:05.566Z] [INFO] EPG initialization successful
+[2025-05-09T22:50:05.567Z] [WARN] Test EPG source already exists
+[2025-05-09T22:50:05.567Z] [INFO] Loaded EPG config with 1 sources
+[2025-05-09T22:50:05.568Z] [INFO] EPG functionality tests passed
+[2025-05-09T22:50:05.568Z] [INFO] Testing channel search and filter
+[2025-05-09T22:50:05.673Z] [INFO] Found 10960 total channels
+[2025-05-09T22:50:05.679Z] [INFO] Found 795 channels matching 'news' query
+[2025-05-09T22:50:05.681Z] [INFO] Found 127 channel groups
+[2025-05-09T22:50:05.682Z] [INFO] Found 3853 channels in group "Undefined"
+[2025-05-09T22:50:05.682Z] [INFO] Channel search and filter tests passed
+[2025-05-09T22:50:05.683Z] [INFO] Testing metadata overlay
+[2025-05-09T22:50:05.788Z] [INFO] Properly handled metadata request with no active channel
+[2025-05-09T22:50:05.788Z] [INFO] Note: Full metadata overlay testing requires manual verification during playback
+[2025-05-09T22:50:05.789Z] [INFO] Metadata overlay tests completed
+[2025-05-09T22:50:05.789Z] [INFO] All UI enhancement tests completed successfully

@@ -1,0 +1,69 @@
+[2025-05-09T22:53:10.332Z] [INFO] Starting error analysis
+
+=====================================
+  IPTV Player Error Analysis Report  
+=====================================
+
+Generated: 2025-05-09T22:53:10.337Z
+[2025-05-09T22:53:10.338Z] [INFO] Found 8 log files to analyze
+[2025-05-09T22:53:10.342Z] [INFO] Found 0 errors in diagnostic_run.log
+[2025-05-09T22:53:10.343Z] [INFO] Found 0 errors in epg.log
+[2025-05-09T22:53:10.344Z] [INFO] Found 4 errors in error_analysis.log
+[2025-05-09T22:53:10.345Z] [INFO] Found 0 errors in player_test.log
+[2025-05-09T22:53:10.346Z] [INFO] Found 0 errors in recording_test.log
+[2025-05-09T22:53:10.348Z] [INFO] Found 3 errors in settings_test.log
+[2025-05-09T22:53:10.349Z] [INFO] Found 0 errors in ui-enhancements.log
+[2025-05-09T22:53:10.350Z] [INFO] Found 0 errors in verification.log
+[2025-05-09T22:53:10.350Z] [INFO] Total errors found: 7
+
+====================
+  Error Categories  
+====================
+
+Error breakdown by category:
+
+UNKNOWN: 6 occurrences (86%)
+CONFIG: 1 occurrences (14%)
+
+
+=================
+  Common Errors  
+=================
+
+Most common errors:
+
+1. Occurred 1 times:
+   "Starting error analysis"
+
+2. Occurred 1 times:
+   "IPTV Player Error Analysis Report"
+
+3. Occurred 1 times:
+   "Found 0 errors in diagnostic_run.log"
+
+4. Occurred 1 times:
+   "Found 0 errors in epg.log"
+
+5. Occurred 1 times:
+   "Invalid file validation correctly failed: PASSED ✅"
+
+6. Occurred 1 times:
+   "Settings log exists: FAILED ❌"
+
+7. Occurred 1 times:
+   "Sources log exists: FAILED ❌"
+
+
+
+===================
+  Recommendations  
+===================
+
+- Reset settings to default and reconfigure
+- Check for malformed JSON in settings files
+- Verify configuration paths are correct for platform
+- Review application logs for more context
+- Check application version and update if necessary
+- Verify all dependencies are correctly installed
+[2025-05-09T22:53:10.353Z] [INFO] Error analysis completed successfully
+[2025-05-09T22:53:10.353Z] [INFO] Full report written to: c:\Users\GEorg\Desktop\TV\tests\error_analysis.log

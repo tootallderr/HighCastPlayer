@@ -8,13 +8,107 @@ const { app, BrowserWindow, ipcMain, Menu, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
-const dependencyCheck = require('./dependency-check');
+
+// Setup global error handler first thing
+const errorHandler = require('./error-handler');
+errorHandler.setupGlobalErrorHandlers();
+
+// Initialize critical directories before requiring other modules
+function ensureAppDirectories() {
+  const userData = app.getPath('userData');
+  
+  // Essential directories
+  const dirs = [
+    path.join(userData, 'data'),
+    path.join(userData, 'data/playlists'),
+    path.join(userData, 'data/recordings'),
+    path.join(userData, 'logs'),
+    path.join(userData, 'cache')
+  ];
+    // Create each directory if it doesn't exist
+  dirs.forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      try {
+        fs.mkdirSync(dir, { recursive: true });
+        console.log(`Created directory: ${dir}`);
+      } catch (err) {
+        // Use our error handler
+        const error = new Error(`Failed to create directory ${dir}: ${err.message}`);
+        errorHandler.logError(error, 'DIRECTORY_CREATION');
+      }
+    }
+  });
+  
+  // Create empty settings and sources files if they don't exist
+  const settingsPath = path.join(userData, 'data', 'settings.json');
+  const sourcesPath = path.join(userData, 'data', 'sources.json');
+    if (!fs.existsSync(settingsPath)) {
+    try {
+      fs.writeFileSync(settingsPath, '{}', 'utf8');
+      console.log('Created empty settings file');
+    } catch (err) {
+      // Use error handler for settings file creation errors
+      const error = new Error(`Failed to create settings file: ${err.message}`);
+      errorHandler.logError(error, 'SETTINGS_FILE_CREATION');
+    }
+  }
+    if (!fs.existsSync(sourcesPath)) {
+    try {
+      fs.writeFileSync(sourcesPath, '{"remote":[],"local":[]}', 'utf8');
+      console.log('Created empty sources file');
+    } catch (err) {
+      // Use error handler for sources file creation errors
+      const error = new Error(`Failed to create sources file: ${err.message}`);
+      errorHandler.logError(error, 'SOURCES_FILE_CREATION');
+    }
+  }
+}
+
+// Make sure directories exist before requiring modules that might need them
+// Must be called after app is ready
+function initAppDirectories() {
+  try {
+    ensureAppDirectories();
+    
+    // Initialize merged playlist file early
+    const userData = app.getPath('userData');
+    const mergedPlaylistPath = path.join(userData, 'data', 'merged-playlist.m3u8');
+      if (!fs.existsSync(mergedPlaylistPath)) {
+      try {
+        fs.writeFileSync(mergedPlaylistPath, '#EXTM3U\n# Empty playlist file\n', 'utf8');
+        console.log('Created empty merged playlist file');
+      } catch (err) {
+        // Use error handler for merged playlist file creation errors
+        const error = new Error(`Failed to create merged playlist file: ${err.message}`);
+        errorHandler.logError(error, 'PLAYLIST_FILE_CREATION');
+      }
+    }  } catch (err) {
+    // Log error with error handler
+    errorHandler.logError(err, 'APP_DIRECTORY_INITIALIZATION');
+    
+    // Show error dialog to user
+    dialog.showErrorBox(
+      'Initialization Error', 
+      `Failed to initialize application directories: ${err.message}\n\nThe application may not work correctly.`
+    );
+  }
+}
+
+// Import path manager first to ensure it's initialized early
+const pathManager = require('./path-manager');
+
+// Now require other modules after our directory initialization function is defined
+const dependencyCheck = require('./dependency-check-improved');
 const platform = require('./platform');
-const playlistManager = require('./playlist-manager');
 const playerEngine = require('./player-engine');
+const playlistManager = require('./playlist-manager');
+const captionManager = require('./caption-manager');
+// Use improved casting manager with better error handling
+// Use the fixed casting manager which has better error handling
+const castingManager = require('./casting-manager-fixed');
+const recommendationEngine = require('./recommendation-engine-improved');
 const recordingScheduler = require('./recording-scheduler');
 const epgManager = require('./epg-manager');
-const captionManager = require('./caption-manager');
 const config = require('./config-manager');
 const updater = require('./updater');
 const autoStart = require('./auto-start');
@@ -32,6 +126,9 @@ if (isDev) {
 } else {
   process.env.NODE_ENV = 'production';
 }
+
+// Debug flags
+const DEBUG_SPLASH = process.argv.includes('--debug-splash');
 
 /**
  * Create the splash screen window
@@ -82,7 +179,7 @@ function createScheduleWindow() {
 
   scheduleWindow.loadURL(url.format({
     pathname: path.join(__dirname, '../ui/schedule-recording.html'),
-    protocol: 'file:',
+    protocol: 'file',
     slashes: true
   }));
 
@@ -112,7 +209,7 @@ function createSettingsWindow() {
 
   settingsWindow.loadURL(url.format({
     pathname: path.join(__dirname, '../ui/settings.html'),
-    protocol: 'file:',
+    protocol: 'file',
     slashes: true
   }));
 
@@ -128,15 +225,14 @@ function createSettingsWindow() {
 /**
  * Create the main application window
  */
-function createMainWindow() {
-  mainWindow = new BrowserWindow({
+function createMainWindow() {  mainWindow = new BrowserWindow({
     width: 1280,
     height: 720,
     minWidth: 800,
     minHeight: 600,
     title: 'IPTV Player',
     icon: path.join(__dirname, '../assets/icon.png'),
-    show: false,
+    show: true, // Show immediately
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -146,7 +242,7 @@ function createMainWindow() {
   });
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, '../ui/index.html'),
-    protocol: 'file:',
+    protocol: 'file',
     slashes: true
   }));
   
@@ -160,9 +256,10 @@ function createMainWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-
   mainWindow.once('ready-to-show', () => {
+    console.log('Main window ready to show');
     if (splashWindow) {
+      console.log('Closing splash window');
       splashWindow.close();
     }
     mainWindow.show();
@@ -184,13 +281,57 @@ function getMenuTemplate() {
         {
           label: 'Add Playlist Source',
           click: () => {
-            mainWindow.webContents.send('show-add-playlist-dialog');
+            if (mainWindow) {
+              mainWindow.webContents.send('show-add-playlist-dialog');
+            }
+          }
+        },
+        {
+          label: 'Update Playlists',
+          click: async () => {
+            try {
+              // Show notification in main window
+              if (mainWindow) {
+                mainWindow.webContents.send('status-message', { 
+                  text: 'Updating playlists...',
+                  type: 'info'
+                });
+              }
+              
+              // Trigger playlist update
+              const result = await playlistManager.updateAllPlaylists();
+              
+              // Notify all windows
+              BrowserWindow.getAllWindows().forEach(window => {
+                window.webContents.send('playlists-updated', result);
+              });
+              
+              // Show result notification
+              if (mainWindow) {
+                mainWindow.webContents.send('status-message', { 
+                  text: result.success 
+                    ? `Successfully updated playlists with ${result.channels} channels` 
+                    : `Playlist update failed: ${result.error}`,
+                  type: result.success ? 'success' : 'error'
+                });
+              }
+            } catch (error) {
+              console.error('Error updating playlists:', error);
+              if (mainWindow) {
+                mainWindow.webContents.send('status-message', { 
+                  text: `Error updating playlists: ${error.message}`,
+                  type: 'error'
+                });
+              }
+            }
           }
         },
         {
           label: 'Settings',
           click: () => {
-            mainWindow.webContents.send('show-settings');
+            if (mainWindow) {
+              mainWindow.webContents.send('show-settings');
+            }
           }
         },
         { type: 'separator' },
@@ -305,16 +446,40 @@ async function initializeApp() {
     const dependencyResult = dependencyCheck.checkAllDependencies();
     
     if (!dependencyResult.success) {
-      dialog.showErrorBox(
-        'Dependency Check Failed',
-        `Missing required dependencies: ${dependencyResult.criticalIssues} critical issues found.
-        Please check the log file for more details.`
-      );
+      const missingDeps = dependencyResult.missingCritical || [];
+      const missingText = missingDeps.length > 0 
+        ? `Missing critical dependencies: ${missingDeps.join(', ')}\n\n`
+        : 'Critical dependency issues found.\n\n';
+        
+      const message = `${missingText}Please run the setup script for your platform:
+      - Windows: setup.bat (Run as Administrator)
+      - macOS/Linux: ./setup.sh
+      
+      See docs/0-prerequisites.md for manual installation instructions.`;
+      
+      dialog.showErrorBox('Dependency Check Failed', message);
+      
       if (!isDev) {
         app.quit();
         return;
+      } else {
+        console.warn('Running in development mode with missing dependencies. Some features may not work.');
       }
-    }    // Initialize player engine
+    }
+    
+    // Check for optional dependencies and show warning if any are missing
+    if (dependencyResult.hasOptionalIssues) {
+      const optionalIssues = dependencyResult.optionalIssues;
+      const missingOptional = [];
+      
+      if (optionalIssues.python) missingOptional.push('Python');
+      if (optionalIssues.dotnet) missingOptional.push('.NET Runtime');
+      if (optionalIssues.scheduler) missingOptional.push(platform.isWindows ? 'Task Scheduler' : 'Cron');
+      
+      console.warn(`Optional dependencies missing: ${missingOptional.join(', ')}. Some features may be limited.`);
+    }
+    
+    // Initialize player engine
     await playerEngine.initialize();
     
     // Initialize recording scheduler
@@ -329,29 +494,49 @@ async function initializeApp() {
     try {
       await epgManager.initialize();
       console.log('EPG service initialized');
-      
-      // Check for updates if needed
+        // Check for updates if needed
       if (epgManager.shouldUpdateEpg()) {
         console.log('EPG data needs updating, starting update...');
         epgManager.updateAllSources()
           .then(result => console.log('EPG update completed:', result))
-          .catch(err => console.error('EPG update error:', err));
+          .catch(err => {
+            // Use error handler for EPG update errors
+            errorHandler.logError(err, 'EPG_UPDATE');
+          });
       }
     } catch (epgError) {
-      console.error('EPG initialization error:', epgError);
+      // Use error handler for EPG initialization errors
+      errorHandler.logError(epgError, 'EPG_INITIALIZATION');
       // Non-critical error, continue app startup
+    }// Create the main window once initialization is complete
+    console.log('Creating main window after initialization');    try {
+      createMainWindow();
+      console.log('Main window created');
+    } catch (windowError) {
+      // Use error handler for window creation errors
+      errorHandler.logError(windowError, 'WINDOW_CREATION');
+      dialog.showErrorBox('Window Creation Error', `Failed to create application window: ${windowError.message}`);
+    }  } catch (error) {
+    // Use error handler for initialization errors
+    errorHandler.logError(error, 'APP_INITIALIZATION');
+    
+    // Make sure we display any errors even if dialog fails
+    try {
+      dialog.showErrorBox(
+        'Initialization Failed', 
+        `Failed to initialize application: ${error.message}`
+      );
+    } catch (dialogError) {
+      // Use error handler for dialog errors
+      errorHandler.logError(dialogError, 'ERROR_DIALOG');
+      // Use a simpler approach as a fallback
+      const errorWindow = new BrowserWindow({
+        width: 500,
+        height: 300,
+        show: true      });
+      errorWindow.loadURL(`data:text/html,<h2>Error</h2><p>${error.message}</p>`);
     }
-    
-    // Create the main window once initialization is complete
-    createMainWindow();
-  } catch (error) {
-    console.error('Initialization error:', error);
-    dialog.showErrorBox(
-      'Initialization Failed', 
-      `Failed to initialize application: ${error.message}`
-    );
-    
-    if (!isDev) {
+      if (!isDev) {
       app.quit();
     }
   }
@@ -359,7 +544,19 @@ async function initializeApp() {
 
 // Application event handlers
 app.on('ready', () => {
+  // Initialize directories before anything else
+  initAppDirectories();
+  
   createSplashWindow();
+  
+  // Set a safety timeout to close splash if main window doesn't load
+  setTimeout(() => {
+    if (splashWindow && !splashWindow.isDestroyed()) {
+      console.log('Safety timeout: Closing splash window');
+      splashWindow.close();
+    }
+  }, 15000); // 15 second timeout
+  
   initializeApp();
 });
 
@@ -490,10 +687,58 @@ ipcMain.on('get-playlist-sources', (event) => {
 // Channel navigator events
 ipcMain.on('load-channels', async (event) => {
   try {
+    console.log('[IPC load-channels] Received request. Initializing player engine if needed.');
+    
+    // Ensure player engine is initialized
+    if (!playerEngine.initialized) {
+      console.log('[IPC load-channels] Player engine not initialized, initializing now.');
+      await playerEngine.initialize();
+    }
+    
+    console.log('[IPC load-channels] Calling playerEngine.getChannels().');
     const channels = await playerEngine.getChannels();
+    
+    if (!channels || !Array.isArray(channels)) {
+      console.warn('[IPC load-channels] getChannels returned invalid data:', channels);
+      event.reply('channels-loaded', []);
+      console.log('[IPC load-channels] Replied with empty channels array due to invalid data.');
+      return;
+    }
+    
+    console.log(`[IPC load-channels] playerEngine.getChannels() returned ${channels.length} channels.`);
+    
+    // Send the channels back to the renderer
     event.reply('channels-loaded', channels);
+    console.log('[IPC load-channels] Replied with channels-loaded.');
+    
+    // If we received no channels, try to update playlists in the background
+    if (channels.length === 0) {
+      console.log('[IPC load-channels] No channels found, triggering background playlist update.');
+      try {
+        playlistManager.updateAllPlaylists().then(result => {
+          console.log(`[IPC] Background playlist update complete: ${result.success ? 'Success' : 'Failed'}`);
+          
+          if (result.success && result.channels > 0) {
+            // Notify renderer that channels are available
+            mainWindow.webContents.send('playlists-updated', { 
+              success: true, 
+              channels: result.channels 
+            });
+          }
+        }).catch(err => {
+          console.error('[IPC] Background playlist update error:', err);
+        });
+      } catch (updateError) {
+        console.error('[IPC] Error starting background playlist update:', updateError);
+      }
+    }
   } catch (error) {
-    event.reply('error', { component: 'channel-navigator', message: error.message });
+    console.error(`[IPC load-channels] Error: ${error.message}`, error);
+    event.reply('error', { component: 'ipc-load-channels', message: error.message });
+    console.log('[IPC load-channels] Replied with error.');
+    
+    // Return empty array as fallback
+    event.reply('channels-loaded', []);
   }
 });
 
@@ -603,6 +848,11 @@ ipcMain.on('schedule-recording', () => {
 // Handle scheduled recording request from UI
 ipcMain.on('schedule-recording-request', async (event, data) => {
   try {
+    // Ensure scheduler is initialized before scheduling a recording
+    if (!recordingScheduler.isInitialized) {
+      await recordingScheduler.initialize();
+    }
+    
     // Data should contain channelId, startTime (ISO string), durationMinutes, and optional title
     const startTime = new Date(data.startTime);
     const result = await recordingScheduler.scheduleRecording(
@@ -619,6 +869,11 @@ ipcMain.on('schedule-recording-request', async (event, data) => {
 
 ipcMain.on('cancel-scheduled-recording', async (event, recordingId) => {
   try {
+    // Ensure scheduler is initialized before cancelling a recording
+    if (!recordingScheduler.isInitialized) {
+      await recordingScheduler.initialize();
+    }
+    
     const result = recordingScheduler.cancelRecording(recordingId);
     event.reply('recording-cancelled', { success: result });
   } catch (error) {
@@ -626,8 +881,12 @@ ipcMain.on('cancel-scheduled-recording', async (event, recordingId) => {
   }
 });
 
-ipcMain.on('get-scheduled-recordings', (event) => {
+ipcMain.on('get-scheduled-recordings', async (event) => {
   try {
+    // Ensure scheduler is initialized before accessing recordings
+    if (!recordingScheduler.isInitialized) {
+      await recordingScheduler.initialize();
+    }
     const recordings = recordingScheduler.getAllScheduledRecordings();
     event.reply('scheduled-recordings', recordings);
   } catch (error) {
@@ -744,22 +1003,22 @@ ipcMain.on('toggle-playlist-source', async (event, data) => {
 });
 
 ipcMain.on('update-playlists', async (event) => {
+  console.log('[IPC update-playlists] Received request to update playlists');
+  
   try {
-    const { logSourceChange } = require('./settings-logger');
-    logSourceChange('Manual playlist update triggered', 'info');
-    
     const result = await playlistManager.updateAllPlaylists();
+    console.log(`[IPC update-playlists] Update result: ${JSON.stringify(result)}`);
     
-    if (result.success) {
-      logSourceChange(`Successfully updated playlists: ${result.playlistCount} playlists, ${result.channels} channels`, 'info');
-      event.reply('playlists-updated', { success: true });
-    } else {
-      logSourceChange(`Failed to update playlists: ${result.error}`, 'error');
-      event.reply('playlists-updated', { success: false, error: result.error });
-    }
+    // Broadcast to all windows
+    BrowserWindow.getAllWindows().forEach(window => {
+      window.webContents.send('playlists-updated', result);
+    });
+    
+    // Reply to the specific sender
+    event.reply('playlists-updated', result);
   } catch (error) {
-    logSourceChange(`Error updating playlists: ${error.message}`, 'error');
-    event.reply('error', { component: 'playlist', message: error.message });
+    console.error(`[IPC update-playlists] Error: ${error.message}`, error);
+    event.reply('error', { component: 'playlist-update', message: error.message });
   }
 });
 
@@ -811,12 +1070,13 @@ ipcMain.on('toggle-captions', (event) => {
     const settings = captionManager.settings;
     settings.enabled = !settings.enabled;
     const result = captionManager.updateSettings(settings);
-    event.reply('captions-toggled', { enabled: settings.enabled, ...result });
+    event.reply('captions-toggled', { enabled: settings.enabled, success: result });
   } catch (error) {
     event.reply('error', { component: 'captions', message: error.message });
   }
 });
 
+// Handler for getting caption settings
 ipcMain.on('get-caption-settings', (event) => {
   try {
     const settings = captionManager.settings;
@@ -826,191 +1086,131 @@ ipcMain.on('get-caption-settings', (event) => {
   }
 });
 
-ipcMain.on('update-caption-settings', (event, settings) => {
+// Handler for updating caption settings
+ipcMain.on('update-caption-settings', (event, newSettings) => {
   try {
-    const result = captionManager.updateSettings(settings);
-    event.reply('caption-settings-updated', result);
+    const result = captionManager.updateSettings(newSettings);
+    event.reply('caption-settings-updated', { success: result, settings: captionManager.settings });
   } catch (error) {
     event.reply('error', { component: 'captions', message: error.message });
   }
 });
 
+// Handler for enhancing caption with AI
 ipcMain.on('enhance-caption', async (event, { text, mode }) => {
   try {
     const enhancedText = await captionManager.enhanceCaptionWithAI(text, mode);
     event.reply('caption-enhanced', { success: true, text: enhancedText });
   } catch (error) {
-    event.reply('error', { component: 'captions', message: error.message });
-    // Return the original text as a fallback
-    event.reply('caption-enhanced', { success: false, text });
+    event.reply('caption-enhanced', { success: false, error: error.message, text });
   }
 });
 
-// Playback info event - for metadata overlay
-ipcMain.on('get-playback-info', async (event) => {
+// Casting events
+ipcMain.on('get-casting-devices', async (event) => {
   try {
-    const info = playerEngine.getPlaybackInfo();
-    event.reply('playback-info', info);
+    const devices = castingManager.getDevices();
+    event.reply('casting-devices', devices);
   } catch (error) {
-    event.reply('error', { component: 'player', message: error.message });
+    event.reply('error', { component: 'casting', message: error.message });
   }
 });
 
-// EPG management events
-ipcMain.on('get-epg-config', (event) => {
+ipcMain.on('refresh-casting-devices', async (event) => {
   try {
-    const epgConfig = epgManager.loadConfig();
-    event.reply('epg-config', epgConfig);
+    const deviceCount = await castingManager.refreshDevices();
+    const devices = castingManager.getDevices();
+    event.reply('casting-devices-refreshed', { success: true, count: deviceCount, devices });
   } catch (error) {
-    event.reply('error', { component: 'epg', message: error.message });
+    event.reply('error', { component: 'casting', message: error.message });
   }
 });
 
-ipcMain.on('add-epg-source', async (event, source) => {
+ipcMain.on('cast-media', async (event, { deviceId, media }) => {
   try {
-    const { logSettingsChange } = require('./settings-logger');
-    
-    // Validate source URL
-    let isValid;
-    try {
-      new URL(source.url);
-      isValid = true;
-    } catch (e) {
-      isValid = false;
-    }
-    
-    if (!isValid) {
-      logSettingsChange(`Invalid EPG source URL: ${source.url}`, 'error');
-      event.reply('epg-source-added', { success: false, error: 'Invalid URL format' });
-      return;
-    }
-    
-    // Add the source
-    const result = epgManager.addSource(source.url, source.name);
-    
-    if (result) {
-      logSettingsChange(`Added new EPG source: ${source.name} (${source.url})`, 'info');
-      
-      // Update EPG data
-      try {
-        await epgManager.updateAllSources();
-        logSettingsChange(`Updated EPG data from ${source.name}`, 'info');
-      } catch (updateError) {
-        logSettingsChange(`Added EPG source but failed to update: ${updateError.message}`, 'warn');
-      }
-      
-      event.reply('epg-source-added', { success: true });
-    } else {
-      logSettingsChange(`Failed to add EPG source: ${source.name} (${source.url})`, 'error');
-      event.reply('epg-source-added', { success: false, error: 'Failed to add source, maybe it already exists?' });
-    }
+    const result = await castingManager.castMedia(deviceId, media);
+    event.reply('media-cast', { success: true, ...result });
   } catch (error) {
-    event.reply('error', { component: 'epg', message: error.message });
+    event.reply('error', { component: 'casting', message: error.message });
+    event.reply('media-cast', { success: false, error: error.message });
   }
 });
 
-ipcMain.on('remove-epg-source', (event, url) => {
+ipcMain.on('stop-casting', async (event) => {
   try {
-    const { logSettingsChange } = require('./settings-logger');
-    const result = epgManager.removeSource(url);
-    
-    if (result) {
-      logSettingsChange(`Removed EPG source: ${url}`, 'info');
-      event.reply('epg-source-removed', { success: true });
-    } else {
-      logSettingsChange(`Failed to remove EPG source: ${url}`, 'error');
-      event.reply('epg-source-removed', { success: false, error: 'Source not found' });
-    }
+    const result = await castingManager.stopCasting();
+    event.reply('casting-stopped', result);
   } catch (error) {
-    event.reply('error', { component: 'epg', message: error.message });
+    event.reply('error', { component: 'casting', message: error.message });
+    event.reply('casting-stopped', { success: false, error: error.message });
   }
 });
 
-ipcMain.on('update-epg', async (event) => {
+ipcMain.on('control-casting', async (event, { action, options }) => {
   try {
-    const { logSettingsChange } = require('./settings-logger');
-    logSettingsChange('Manual EPG update triggered', 'info');
-    
-    const result = await epgManager.updateAllSources();
-    
-    if (result) {
-      logSettingsChange('Successfully updated EPG data', 'info');
-      event.reply('epg-updated', { success: true });
-    } else {
-      logSettingsChange('Failed to update EPG data', 'error');
-      event.reply('epg-updated', { success: false, error: 'Update failed' });
-    }
+    const result = await castingManager.controlPlayback(action, options);
+    event.reply('casting-controlled', { success: true, ...result });
   } catch (error) {
-    event.reply('error', { component: 'epg', message: error.message });
+    event.reply('error', { component: 'casting', message: error.message });
+    event.reply('casting-controlled', { success: false, error: error.message });
   }
 });
 
-ipcMain.on('toggle-epg-source', (event, data) => {
+ipcMain.on('get-casting-status', (event) => {
   try {
-    const { logSettingsChange } = require('./settings-logger');
-    const epgConfig = epgManager.loadConfig();
-    
-    // Find the source
-    const sourceIndex = epgConfig.sources.findIndex(s => s.url === data.url);
-    if (sourceIndex === -1) {
-      logSettingsChange(`Failed to toggle EPG source: ${data.url} not found`, 'error');
-      event.reply('epg-source-toggled', { success: false, error: 'Source not found' });
-      return;
-    }
-    
-    // Update enabled status
-    epgConfig.sources[sourceIndex].enabled = data.enabled;
-    
-    // Save config
-    const result = epgManager.saveConfig(epgConfig);
-    
-    if (result) {
-      logSettingsChange(`${data.enabled ? 'Enabled' : 'Disabled'} EPG source: ${epgConfig.sources[sourceIndex].name || epgConfig.sources[sourceIndex].url}`, 'info');
-      
-      // Update EPG data if necessary
-      if (data.enabled) {
-        epgManager.updateAllSources().catch(err => {
-          logSettingsChange(`Error updating EPG after enabling source: ${err.message}`, 'error');
-        });
-      }
-      
-      event.reply('epg-source-toggled', { success: true });
-    } else {
-      logSettingsChange('Failed to save EPG source state change', 'error');
-      event.reply('epg-source-toggled', { success: false, error: 'Failed to save changes' });
-    }
+    const status = castingManager.getStatus();
+    event.reply('casting-status', status);
   } catch (error) {
-    event.reply('error', { component: 'epg', message: error.message });
+    event.reply('error', { component: 'casting', message: error.message });
+    event.reply('casting-status', { success: false, error: error.message });
   }
 });
 
-// Auto-start handlers
-ipcMain.on('get-auto-start-status', (event) => {
+// Recommendation events
+ipcMain.on('get-recommendations', async (event, { currentChannelId }) => {
   try {
-    const status = autoStart.isAutoStartEnabled();
-    event.reply('auto-start-status', { enabled: status });
+    // Get all channels from the player engine
+    const allChannels = await playerEngine.getChannels();
+    
+    // Get recommendations
+    const recommendations = recommendationEngine.getRecommendations(allChannels, currentChannelId);
+    event.reply('recommendations', recommendations);
   } catch (error) {
-    event.reply('error', { component: 'auto-start', message: error.message });
+    event.reply('error', { component: 'recommendations', message: error.message });
+    event.reply('recommendations', []);
   }
 });
 
-ipcMain.on('toggle-auto-start', (event, enable) => {
+ipcMain.on('get-viewing-history', (event, { limit }) => {
   try {
-    const result = autoStart.configureAutoStart(enable);
-    event.reply('auto-start-toggled', { 
-      success: result, 
-      enabled: enable 
-    });
-    
-    if (result) {
-      logSettingsChange(`${enable ? 'Enabled' : 'Disabled'} auto-start at login`, 'info');
-    } else {
-      logSettingsChange(`Failed to ${enable ? 'enable' : 'disable'} auto-start at login`, 'error');
-    }
+    const history = recommendationEngine.getViewingHistory(limit);
+    event.reply('viewing-history', history);
   } catch (error) {
-    event.reply('error', { component: 'auto-start', message: error.message });
+    event.reply('error', { component: 'recommendations', message: error.message });
+    event.reply('viewing-history', []);
   }
 });
+
+ipcMain.on('get-top-watched-channels', (event, { limit }) => {
+  try {
+    const topChannels = recommendationEngine.getTopWatchedChannels(limit);
+    event.reply('top-watched-channels', topChannels);
+  } catch (error) {
+    event.reply('error', { component: 'recommendations', message: error.message });
+    event.reply('top-watched-channels', []);
+  }
+});
+
+ipcMain.on('clear-viewing-history', async (event) => {
+  try {
+    const result = await recommendationEngine.clearHistory();
+    event.reply('viewing-history-cleared', { success: result });
+  } catch (error) {
+    event.reply('error', { component: 'recommendations', message: error.message });
+    event.reply('viewing-history-cleared', { success: false, error: error.message });
+  }
+});
+
 
 // Add a check for updates IPC handler that doesn't require the renderer to know about the updater module
 ipcMain.on('check-for-updates-manual', (event) => {
@@ -1087,5 +1287,77 @@ ipcMain.on('set-active-captions', (event, captionIds) => {
     event.reply('active-captions-set');
   } catch (error) {
     event.reply('error', { component: 'caption', message: error.message });
+  }
+});
+
+// Modernization Settings events
+ipcMain.on('get-modernization-settings', (event) => {
+  try {
+    // Get settings from config manager
+    const allSettings = config.getAll();
+    const modernizationSettings = allSettings.modernization || {};
+    
+    event.reply('modernization-settings', modernizationSettings);
+  } catch (error) {
+    log.error('Error getting modernization settings:', error);
+    event.reply('error', { component: 'settings', message: error.message });
+  }
+});
+
+ipcMain.on('save-modernization-settings', (event, settings) => {
+  try {
+    // Save settings to config manager
+    const allSettings = config.getAll();
+    allSettings.modernization = settings;
+    config.setAll(allSettings);
+    
+    // Apply settings to components
+    if (settings.casting) {
+      castingManager.updateSettings(settings.casting);
+    }
+    
+    if (settings.recommendations) {
+      recommendationEngine.updateSettings(settings.recommendations);
+    }
+    
+    event.reply('modernization-settings-saved', { success: true });
+  } catch (error) {
+    log.error('Error saving modernization settings:', error);
+    event.reply('error', { component: 'settings', message: error.message });
+    event.reply('modernization-settings-saved', { success: false, error: error.message });
+  }
+});
+
+ipcMain.on('test-casting', async (event) => {
+  try {
+    // Attempt to discover devices
+    const deviceCount = await castingManager.refreshDevices();
+    
+    if (deviceCount > 0) {
+      event.reply('casting-test-result', { 
+        success: true, 
+        message: `Found ${deviceCount} casting device(s)` 
+      });
+    } else {
+      event.reply('casting-test-result', { 
+        success: false, 
+        error: 'No casting devices found on network' 
+      });
+    }
+  } catch (error) {
+    log.error('Error testing casting:', error);
+    event.reply('error', { component: 'casting', message: error.message });
+    event.reply('casting-test-result', { success: false, error: error.message });
+  }
+});
+
+ipcMain.on('clear-casting-cache', (event) => {
+  try {
+    castingManager.clearDeviceCache();
+    event.reply('casting-cache-cleared', { success: true });
+  } catch (error) {
+    log.error('Error clearing casting cache:', error);
+    event.reply('error', { component: 'casting', message: error.message });
+    event.reply('casting-cache-cleared', { success: false, error: error.message });
   }
 });

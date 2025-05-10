@@ -11,23 +11,18 @@ const https = require('https');
 const http = require('http');
 const { URL } = require('url');
 const platform = require('./platform');
+const { app } = require('electron');
+const pathManager = require('./path-manager'); // Import centralized path manager
 
 // Define paths
-const PLAYLISTS_DIR = path.join(__dirname, '..', 'data', 'playlists');
-const MERGED_PLAYLIST = path.join(__dirname, '..', 'data', 'merged-playlist.m3u8');
-const SOURCES_JSON = path.join(__dirname, '..', 'data', 'sources.json');
-const LOG_FILE = path.join(__dirname, '..', 'tests', 'playlist_update.log');
+const DATA_DIR = pathManager.getDataDir();
+const PLAYLISTS_DIR = pathManager.getPlaylistsDir();
+const MERGED_PLAYLIST = pathManager.getMergedPlaylistPath();
+const SOURCES_JSON = pathManager.getSourcesPath();
+const LOGS_DIR = pathManager.getLogsDir();
+const LOG_FILE = pathManager.getLogPath('playlist_update.log');
 
-// Ensure directories exist
-if (!fs.existsSync(PLAYLISTS_DIR)) {
-    fs.mkdirSync(PLAYLISTS_DIR, { recursive: true });
-}
-
-// Ensure log directory exists
-const logDir = path.dirname(LOG_FILE);
-if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir, { recursive: true });
-}
+// The path manager handles directory creation, no need for explicit checks here
 
 /**
  * Log function for playlist operations
@@ -36,12 +31,20 @@ function log(message, level = 'info') {
     const timestamp = new Date().toISOString();
     const formattedMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}\n`;
     
-    // Append to log file
-    fs.appendFileSync(LOG_FILE, formattedMessage);
+    // Also log to console for visibility
+    console.log(`[PlaylistManager] ${level.toUpperCase()}: ${message}`);
     
-    // Also console log if not in production
-    if (process.env.NODE_ENV !== 'production') {
-        console.log(`[Playlist] ${message}`);
+    // Append to log file
+    try {
+        fs.appendFileSync(LOG_FILE, formattedMessage);
+    } catch (err) {
+        // Use electron-log if available for better error reporting
+        try {
+            const electronLog = require('electron-log');
+            electronLog.error(`[PlaylistManager] Failed to write to log file: ${err.message}`);
+        } catch (electronLogError) {
+            console.error(`[PlaylistManager] Failed to write to log file: ${err.message}`);
+        }
     }
 }
 
@@ -50,19 +53,18 @@ function log(message, level = 'info') {
  */
 function loadSources() {
     try {
-        if (fs.existsSync(SOURCES_JSON)) {
-            const sourcesData = fs.readFileSync(SOURCES_JSON, 'utf8');
-            return JSON.parse(sourcesData);
+        if (!fs.existsSync(SOURCES_JSON)) {
+            log('Sources file not found, creating empty sources file', 'warn');
+            saveSources({ remote: [], local: [] });
+            return { remote: [], local: [] };
         }
+        
+        const sourcesData = fs.readFileSync(SOURCES_JSON, 'utf8');
+        return JSON.parse(sourcesData);
     } catch (error) {
         log(`Error loading sources: ${error.message}`, 'error');
+        return { remote: [], local: [] };
     }
-    
-    // Return default empty sources if file doesn't exist or has an error
-    return { 
-        remote: [], 
-        local: [] 
-    };
 }
 
 /**
@@ -309,93 +311,178 @@ function mergePlaylistsToFile(playlists, outputPath) {
 async function updateAllPlaylists() {
     log('Starting playlist update');
     
-    const sources = loadSources();
+    let sources;
+    try {
+        sources = loadSources();
+        log(`Loaded ${sources.remote.length} remote sources and ${sources.local.length} local sources`);
+    } catch (error) {
+        log(`Error loading playlist sources: ${error.message}. Creating empty sources file.`, 'error');
+        sources = { remote: [], local: [] };
+        try {
+            saveSources(sources);
+        } catch (saveError) {
+            log(`Failed to create empty sources file: ${saveError.message}`, 'error');
+        }
+    }
+    
     const playlists = [];
     const errors = [];
     
     // Process remote playlists
+    log(`Processing ${sources.remote.length} remote sources`);
     for (let i = 0; i < sources.remote.length; i++) {
         const source = sources.remote[i];
+        // Skip disabled sources
+        if (source.enabled === false) {
+            log(`Skipping disabled remote source: ${source.name || source.url}`, 'info');
+            continue;
+        }
+        
         const filename = `remote_${i + 1}_${new Date().getTime()}.m3u8`;
         
         try {
-            // Download the remote playlist
+            log(`Downloading playlist from ${source.url}`);
             const filePath = await downloadPlaylist(source.url, filename);
             
-            // Parse the playlist
-            const channels = parsePlaylist(filePath, `remote_${i + 1}`);
-            
-            playlists.push({
-                id: `remote_${i + 1}`,
-                name: source.name || `Remote Playlist ${i + 1}`,
-                type: 'remote',
-                url: source.url,
-                file: filePath,
-                channels: channels
-            });
-        } catch (error) {
-            log(`Error processing remote playlist ${source.name || source.url}: ${error.message}`, 'error');
+            try {
+                const channels = parsePlaylist(filePath, `remote_${i}`);
+                playlists.push({
+                    id: `remote_${i}`,
+                    name: source.name || source.url,
+                    source: source.url,
+                    filePath: filePath,
+                    channels: channels
+                });
+                
+                // Update source metadata with last update time
+                sources.remote[i].updated = new Date().toISOString();
+                
+                log(`Successfully processed remote playlist: ${source.name || source.url} with ${channels.length} channels`);
+            } catch (parseError) {
+                log(`Error parsing remote playlist ${source.url}: ${parseError.message}`, 'error');
+                errors.push({
+                    source: source.url,
+                    error: parseError.message
+                });
+            }
+        } catch (downloadError) {
+            log(`Error downloading remote playlist ${source.url}: ${downloadError.message}`, 'error');
             errors.push({
-                source: source,
-                error: error.message
+                source: source.url,
+                error: downloadError.message
             });
         }
     }
     
     // Process local playlists
+    log(`Processing ${sources.local.length} local sources`);
     for (let i = 0; i < sources.local.length; i++) {
         const source = sources.local[i];
+        // Skip disabled sources
+        if (source.enabled === false) {
+            log(`Skipping disabled local source: ${source.name || source.path}`, 'info');
+            continue;
+        }
+        
+        if (!source.path || !fs.existsSync(source.path)) {
+            log(`Local playlist path does not exist: ${source.path}`, 'error');
+            errors.push({
+                source: source.path,
+                error: 'File not found'
+            });
+            continue;
+        }
+        
         const filename = `local_${i + 1}_${new Date().getTime()}.m3u8`;
         
         try {
-            // Copy the local playlist
+            log(`Copying local playlist from ${source.path}`);
             const filePath = await copyLocalPlaylist(source.path, filename);
             
-            // Parse the playlist
-            const channels = parsePlaylist(filePath, `local_${i + 1}`);
-            
-            playlists.push({
-                id: `local_${i + 1}`,
-                name: source.name || `Local Playlist ${i + 1}`,
-                type: 'local',
-                path: source.path,
-                file: filePath,
-                channels: channels
-            });
-        } catch (error) {
-            log(`Error processing local playlist ${source.name || source.path}: ${error.message}`, 'error');
+            try {
+                const channels = parsePlaylist(filePath, `local_${i}`);
+                playlists.push({
+                    id: `local_${i}`,
+                    name: source.name || source.path,
+                    source: source.path,
+                    filePath: filePath,
+                    channels: channels
+                });
+                
+                // Update source metadata with last update time
+                sources.local[i].updated = new Date().toISOString();
+                
+                log(`Successfully processed local playlist: ${source.name || source.path} with ${channels.length} channels`);
+            } catch (parseError) {
+                log(`Error parsing local playlist ${source.path}: ${parseError.message}`, 'error');
+                errors.push({
+                    source: source.path,
+                    error: parseError.message
+                });
+            }
+        } catch (copyError) {
+            log(`Error copying local playlist ${source.path}: ${copyError.message}`, 'error');
             errors.push({
-                source: source,
-                error: error.message
+                source: source.path,
+                error: copyError.message
             });
         }
     }
     
-    // Merge all playlists
+    // Save updated sources with last update timestamps
+    try {
+        saveSources(sources);
+        log('Updated sources with latest timestamps');
+    } catch (error) {
+        log(`Error saving sources: ${error.message}`, 'error');
+    }
+    
+    // Merge playlists if there are any successful ones
     if (playlists.length > 0) {
         try {
+            log(`Merging ${playlists.length} playlists`);
             const mergeResult = mergePlaylistsToFile(playlists, MERGED_PLAYLIST);
-            log(`Playlist update completed: ${mergeResult.uniqueChannels} unique channels from ${playlists.length} sources`);
+            log(`Successfully merged ${mergeResult.uniqueChannels} unique channels from ${playlists.length} playlists`);
             
             return {
                 success: true,
-                playlistCount: playlists.length,
+                playlists: playlists.length,
                 channels: mergeResult.uniqueChannels,
                 errors: errors
             };
-        } catch (error) {
-            log(`Failed to merge playlists: ${error.message}`, 'error');
+        } catch (mergeError) {
+            log(`Error merging playlists: ${mergeError.message}`, 'error');
+            
+            // Create a minimal valid playlist file to avoid breaking the player
+            try {
+                const minimalContent = '#EXTM3U\n#PLAYLIST: IPTV Player Merged Playlist (Error Recovery)\n';
+                fs.writeFileSync(MERGED_PLAYLIST, minimalContent, 'utf8');
+                log('Created minimal valid playlist file after merge error', 'warn');
+            } catch (writeError) {
+                log(`Failed to create minimal playlist: ${writeError.message}`, 'error');
+            }
+            
             return {
                 success: false,
-                error: error.message,
-                errors: errors
+                error: mergeError.message,
+                errors: [...errors, { source: 'merge', error: mergeError.message }]
             };
         }
     } else {
-        log('No playlists to merge', 'warn');
+        log('No playlists were successfully processed, cannot merge', 'error');
+        
+        // Create a minimal valid playlist file to avoid breaking the player
+        try {
+            const minimalContent = '#EXTM3U\n#PLAYLIST: IPTV Player Merged Playlist (No Sources)\n';
+            fs.writeFileSync(MERGED_PLAYLIST, minimalContent, 'utf8');
+            log('Created minimal valid playlist file due to no sources', 'warn');
+        } catch (writeError) {
+            log(`Failed to create minimal playlist: ${writeError.message}`, 'error');
+        }
+        
         return {
             success: false,
-            error: 'No playlists to merge',
+            error: 'No playlists available to merge',
             errors: errors
         };
     }
@@ -433,11 +520,15 @@ function addRemoteSource(url, name = '') {
         log(`Invalid URL format: ${url}`, 'error');
         return { success: false, error: 'Invalid URL format' };
     }
-    
-    // Check if URL already exists
+      // Check if URL already exists
     if (sources.remote.some(source => source.url === url)) {
         log(`Remote source already exists: ${url}`, 'warn');
-        return { success: false, error: 'Source already exists' };
+        return { 
+            success: false, 
+            error: 'Source already exists',
+            exists: true,
+            url: url
+        };
     }
     
     // Add new source
@@ -587,6 +678,53 @@ function cleanupOldPlaylists(maxAge = 86400000) { // Default: 24 hours
     }
 }
 
+/**
+ * Update or add a remote playlist source
+ * If the source already exists, it will be updated with the new name
+ */
+function updateOrAddRemoteSource(url, name = '') {
+    const sources = loadSources();
+    
+    // Validate URL format
+    try {
+        new URL(url);
+    } catch (error) {
+        log(`Invalid URL format: ${url}`, 'error');
+        return { success: false, error: 'Invalid URL format' };
+    }
+    
+    // Check if URL already exists
+    const existingIndex = sources.remote.findIndex(source => source.url === url);
+    if (existingIndex >= 0) {
+        // Update existing source
+        sources.remote[existingIndex].name = name || sources.remote[existingIndex].name;
+        sources.remote[existingIndex].updated = new Date().toISOString();
+        
+        // Save updated sources
+        if (saveSources(sources)) {
+            log(`Updated existing remote playlist source: ${url}`);
+            return { success: true, updated: true };
+        } else {
+            return { success: false, error: 'Failed to save sources' };
+        }
+    } else {
+        // Add new source
+        sources.remote.push({ 
+            url: url, 
+            name: name || `Remote Playlist ${sources.remote.length + 1}`,
+            added: new Date().toISOString() 
+        });
+        
+        // Save updated sources
+        if (saveSources(sources)) {
+            log(`Added new remote playlist source: ${url}`);
+            return { success: true, updated: false };
+        } else {
+            return { success: false, error: 'Failed to save sources' };
+        }
+    }
+}
+
 // Export module functions
 const exportedModule = {
     updateAllPlaylists,
@@ -596,7 +734,8 @@ const exportedModule = {
     removeSource,
     getSources,
     getMergedPlaylistPath,
-    cleanupOldPlaylists
+    cleanupOldPlaylists,
+    updateOrAddRemoteSource
 };
 
 // Log export to debug

@@ -1,0 +1,23 @@
+{
+  "player": {
+    "volume": 1.0,
+    "muted": false,
+    "autoplay": true,
+    "bufferLength": 30,
+    "useHardwareAcceleration": true
+  },
+  "playlists": {
+    "updateInterval": 60,
+    "autoMerge": true
+  },
+  "recordings": {
+    "format": "mp4",
+    "quality": "original",
+    "folder": "recordings"
+  },
+  "ui": {
+    "theme": "dark",
+    "language": "en",
+    "showNotifications": true
+  }
+} 

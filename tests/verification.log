@@ -1,0 +1,41 @@
+[2025-05-10T13:31:45.648Z] === IPTV Player Verification Tests ===
+[2025-05-10T13:31:45.651Z] Running on Windows
+[2025-05-10T13:31:45.651Z] Current timestamp: 2025-05-10T13:31:45.651Z
+[2025-05-10T13:31:45.652Z] 
+[2025-05-10T13:31:45.652Z] 1. Testing Platform Detection...
+[2025-05-10T13:31:45.653Z] - OS detected as: Windows
+[2025-05-10T13:31:45.658Z] - Detailed OS info: {
+  "platform": "win32",
+  "release": "10.0.26100",
+  "type": "Windows_NT",
+  "arch": "x64",
+  "hostname": "desktop",
+  "username": "GEorg"
+}
+[2025-05-10T13:31:45.658Z] - Path separator: \
+[2025-05-10T13:31:45.659Z] - App data path: C:\Users\GEorg\AppData\Roaming\iptv-player
+[2025-05-10T13:31:45.659Z] - Platform scheduler: taskschd
+[2025-05-10T13:31:45.660Z] Verifying platform detection results...
+[2025-05-10T13:31:45.660Z] Platform detection PASSED ✅
+[2025-05-10T13:31:45.660Z] 
+[2025-05-10T13:31:45.661Z] 2. Testing Dependency Checks...
+[2025-05-10T13:31:45.860Z] Dependencies check results:
+[2025-05-10T13:31:45.860Z] - Node.js: INSTALLED ✅
+[2025-05-10T13:31:45.861Z]   Version: v22.15.0
+[2025-05-10T13:31:45.861Z] - FFmpeg: INSTALLED ✅
+[2025-05-10T13:31:45.861Z]   Version: ffmpeg version 7.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
+[2025-05-10T13:31:45.862Z] - Python: INSTALLED ✅
+[2025-05-10T13:31:45.862Z]   Version: Python 3.13.3
+[2025-05-10T13:31:45.863Z] - .NET: INSTALLED ✅
+[2025-05-10T13:31:45.863Z]   Version: 6.0.428
+[2025-05-10T13:31:45.863Z] 
+[2025-05-10T13:31:45.863Z] 3. Verifying Directory Structure...
+[2025-05-10T13:31:45.864Z] - src: EXISTS ✅
+[2025-05-10T13:31:45.864Z] - data: EXISTS ✅
+[2025-05-10T13:31:45.865Z] - data/playlists: EXISTS ✅
+[2025-05-10T13:31:45.865Z] - data/recordings: EXISTS ✅
+[2025-05-10T13:31:45.865Z] - tests: EXISTS ✅
+[2025-05-10T13:31:45.866Z] - docs: EXISTS ✅
+[2025-05-10T13:31:45.866Z] 
+[2025-05-10T13:31:45.867Z] 
+[2025-05-10T13:31:45.867Z] === Verification Complete ===

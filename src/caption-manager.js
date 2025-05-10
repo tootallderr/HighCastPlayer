@@ -408,6 +408,34 @@ class CaptionManager {
   }
   
   /**
+   * Parse a caption file from disk
+   * @param {string} filePath - Path to caption file
+   * @returns {Array} - Array of parsed caption entries
+   */
+  async parseCaptionFile(filePath) {
+    try {
+      const content = await promisify(fs.readFile)(filePath, 'utf8');
+      const extension = path.extname(filePath).toLowerCase();
+      
+      if (extension === '.vtt') {
+        return this.parseVTT(content);
+      } else if (extension === '.srt') {
+        return this.parseSRT(content);
+      } else {
+        // Try to auto-detect format
+        if (content.includes('WEBVTT')) {
+          return this.parseVTT(content);
+        } else {
+          return this.parseSRT(content);
+        }
+      }
+    } catch (error) {
+      this.logError(`Error parsing caption file: ${error.message}`);
+      return [];
+    }
+  }
+  
+  /**
    * Get caption text for specific time
    * @param {number} time - Current time in milliseconds
    * @param {Array} captions - Array of caption entries

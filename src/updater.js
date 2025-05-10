@@ -55,9 +55,9 @@ class Updater {
     // Configure electron-updater
     autoUpdater.autoDownload = true;
     autoUpdater.autoInstallOnAppQuit = true;
-    
-    // Set custom URL (optional - by default it will use the URL from electron-builder.json)
-    if (SERVER_URL && SERVER_URL !== 'https://update.iptvplayer.example.com') {
+      // Set custom URL (optional - by default it will use the URL from electron-builder.json)
+    const SERVER_URL = process.env.UPDATE_SERVER_URL || 'https://update.iptvplayer.example.com';
+    if (SERVER_URL !== 'https://update.iptvplayer.example.com') {
       const options = {
         provider: 'generic',
         url: SERVER_URL

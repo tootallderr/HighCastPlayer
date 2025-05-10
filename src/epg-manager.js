@@ -475,5 +475,6 @@ module.exports = {
   getChannels,
   getChannelPrograms,
   getCurrentProgram,
-  searchPrograms
+  searchPrograms,
+  shouldUpdateEpg
 };

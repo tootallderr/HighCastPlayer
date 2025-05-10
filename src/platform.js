@@ -59,6 +59,16 @@ const platform = {
   },  // Check if a command exists in PATH
   commandExists(command) {
     try {
+      // Special handling for Python on Windows to avoid Microsoft Store redirect message
+      if (this.isWindows && (command === 'python' || command === 'python3')) {
+        try {
+          const result = execSync(`${command} --version 2>nul`, { stdio: 'pipe' });
+          return result.toString().toLowerCase().includes('python');
+        } catch (e) {
+          return false;
+        }
+      }
+      
       if (this.isWindows) {
         execSync(`where ${command}`, { stdio: 'ignore' });
       } else {
@@ -123,16 +133,10 @@ const platform = {
   getHomeDir() {
     return os.homedir();
   },
-  
-  // Check if ffmpeg is installed
-  hasFFmpeg() {
-    return this.commandExists('ffmpeg');
-  },
-  
-  // Check required dependencies
+    // Check required dependencies
   checkDependencies() {
     const dependencies = {
-      ffmpeg: this.commandExists('ffmpeg'),
+      ffmpeg: this.hasFFmpeg(),
       node: true, // If this code is running, Node.js is available
       python: this.commandExists('python') || this.commandExists('python3'),
       dotnet: this.commandExists('dotnet')

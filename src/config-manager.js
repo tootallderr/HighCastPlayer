@@ -7,10 +7,11 @@
 const fs = require('fs');
 const path = require('path');
 const platform = require('./platform');
+const pathManager = require('./path-manager');
 
-// Define paths
-const CONFIG_DIR = path.join(platform.getAppDataPath());
-const CONFIG_FILE = path.join(CONFIG_DIR, 'settings.json');
+// Use centralized path management
+const CONFIG_DIR = pathManager.getDataDir();
+const CONFIG_FILE = pathManager.getSettingsPath();
 const DEFAULT_CONFIG = {
   player: {
     volume: 1.0,
@@ -21,11 +22,12 @@ const DEFAULT_CONFIG = {
   },
   playlists: {
     updateInterval: 60, // minutes
+    autoMerge: true
   },
   recordings: {
     format: 'mp4',
     quality: 'original',
-    folder: path.join(platform.getAppDataPath(), 'recordings'),
+    folder: pathManager.getRecordingsDir(),
   },
   ui: {
     theme: 'dark',
@@ -34,23 +36,7 @@ const DEFAULT_CONFIG = {
   }
 };
 
-// Ensure config directory exists
-if (!fs.existsSync(CONFIG_DIR)) {
-  try {
-    fs.mkdirSync(CONFIG_DIR, { recursive: true });
-  } catch (error) {
-    console.error(`Error creating config directory: ${error.message}`);
-  }
-}
-
-// Ensure recordings directory exists
-if (!fs.existsSync(DEFAULT_CONFIG.recordings.folder)) {
-  try {
-    fs.mkdirSync(DEFAULT_CONFIG.recordings.folder, { recursive: true });
-  } catch (error) {
-    console.error(`Error creating recordings directory: ${error.message}`);
-  }
-}
+// Path manager already ensures config directory exists
 
 /**
  * Load configuration from file or create with defaults
@@ -59,16 +45,71 @@ function loadConfig() {
   try {
     if (fs.existsSync(CONFIG_FILE)) {
       const configData = fs.readFileSync(CONFIG_FILE, 'utf8');
-      // Merge with defaults to ensure all required fields are present
-      return { ...DEFAULT_CONFIG, ...JSON.parse(configData) };
+      
+      try {
+        // Parse the config file
+        const config = JSON.parse(configData);
+        
+        // Check if the config is empty (just {})
+        if (Object.keys(config).length === 0) {
+          console.log('Config file exists but is empty, using default configuration');
+          saveConfig(DEFAULT_CONFIG);
+          return DEFAULT_CONFIG;
+        }
+        
+        // Deep merge with defaults to ensure all properties exist
+        const mergedConfig = deepMerge(DEFAULT_CONFIG, config);
+        return mergedConfig;
+      } catch (parseError) {
+        console.error(`Error parsing config file: ${parseError.message}`);
+        console.log('Using default configuration');
+        saveConfig(DEFAULT_CONFIG);
+        return DEFAULT_CONFIG;
+      }
+    } else {
+      console.log('Config file does not exist, creating with defaults');
+      saveConfig(DEFAULT_CONFIG);
+      return DEFAULT_CONFIG;
     }
   } catch (error) {
-    console.error(`Error reading config file: ${error.message}`);
+    console.error(`Error loading configuration: ${error.message}`);
+    return DEFAULT_CONFIG;
+  }
+}
+
+/**
+ * Deep merge two objects
+ * @param {Object} target - Target object
+ * @param {Object} source - Source object
+ * @returns {Object} Merged object
+ */
+function deepMerge(target, source) {
+  const output = Object.assign({}, target);
+  
+  if (isObject(target) && isObject(source)) {
+    Object.keys(source).forEach(key => {
+      if (isObject(source[key])) {
+        if (!(key in target)) {
+          Object.assign(output, { [key]: source[key] });
+        } else {
+          output[key] = deepMerge(target[key], source[key]);
+        }
+      } else {
+        Object.assign(output, { [key]: source[key] });
+      }
+    });
   }
   
-  // Create default config if loading fails
-  saveConfig(DEFAULT_CONFIG);
-  return { ...DEFAULT_CONFIG };
+  return output;
+}
+
+/**
+ * Check if value is an object
+ * @param {any} item - Value to check
+ * @returns {boolean} True if object
+ */
+function isObject(item) {
+  return (item && typeof item === 'object' && !Array.isArray(item));
 }
 
 /**

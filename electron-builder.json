@@ -62,10 +62,10 @@
         "path": "/Applications"
       }
     ]
-  },
-  "win": {
+  },  "win": {
     "target": ["nsis"],
-    "icon": "assets/icon.png"
+    "icon": "assets/icon.png",
+    "sign": false
   },
   "nsis": {
     "oneClick": false,
@@ -81,10 +81,7 @@
     "target": ["AppImage", "deb"],
     "category": "Video",
     "icon": "assets/icon.png"
-  },
-  "appImage": {
-    "systemIntegration": "ask"
-  },
+  },  "appImage": {},
   "deb": {
     "depends": [
       "ffmpeg",

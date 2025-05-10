@@ -1,0 +1,77 @@
+[2025-05-09T22:48:50.789Z] [INFO] Initializing EPG manager
+[2025-05-09T22:48:50.790Z] [INFO] No cached EPG data found
+[2025-05-09T22:48:50.792Z] [WARN] EPG source already exists: http://example.com/epg.xml
+[2025-05-09T22:50:05.564Z] [INFO] Initializing EPG manager
+[2025-05-09T22:50:05.565Z] [INFO] No cached EPG data found
+[2025-05-09T22:50:05.566Z] [WARN] EPG source already exists: http://example.com/epg.xml
+[2025-05-10T00:18:00.251Z] [INFO] Initializing EPG manager
+[2025-05-10T00:18:00.252Z] [INFO] No cached EPG data found
+[2025-05-10T00:19:15.205Z] [INFO] Initializing EPG manager
+[2025-05-10T00:19:15.206Z] [INFO] No cached EPG data found
+[2025-05-10T00:23:28.902Z] [INFO] Initializing EPG manager
+[2025-05-10T00:23:28.903Z] [INFO] No cached EPG data found
+[2025-05-10T00:27:06.923Z] [INFO] Initializing EPG manager
+[2025-05-10T00:27:06.924Z] [INFO] No cached EPG data found
+[2025-05-10T00:29:23.351Z] [INFO] Initializing EPG manager
+[2025-05-10T00:29:23.351Z] [INFO] No cached EPG data found
+[2025-05-10T00:30:18.216Z] [INFO] Initializing EPG manager
+[2025-05-10T00:30:18.217Z] [INFO] No cached EPG data found
+[2025-05-10T00:31:42.913Z] [INFO] Initializing EPG manager
+[2025-05-10T00:31:42.914Z] [INFO] No cached EPG data found
+[2025-05-10T00:33:53.740Z] [INFO] Initializing EPG manager
+[2025-05-10T00:33:53.741Z] [INFO] No cached EPG data found
+[2025-05-10T00:35:19.743Z] [INFO] Initializing EPG manager
+[2025-05-10T00:35:19.744Z] [INFO] No cached EPG data found
+[2025-05-10T00:53:33.018Z] [INFO] Initializing EPG manager
+[2025-05-10T00:53:33.019Z] [INFO] No cached EPG data found
+[2025-05-10T00:56:57.689Z] [INFO] Initializing EPG manager
+[2025-05-10T00:56:57.690Z] [INFO] No cached EPG data found
+[2025-05-10T00:58:30.898Z] [INFO] Initializing EPG manager
+[2025-05-10T00:58:30.899Z] [INFO] No cached EPG data found
+[2025-05-10T12:55:06.198Z] [INFO] Initializing EPG manager
+[2025-05-10T12:55:06.199Z] [INFO] No cached EPG data found
+[2025-05-10T12:55:06.200Z] [INFO] EPG data needs updating
+[2025-05-10T12:55:06.200Z] [INFO] Updating 1 EPG sources
+[2025-05-10T12:55:06.201Z] [INFO] Fetching EPG data from: http://example.com/epg.xml
+[2025-05-10T12:55:06.205Z] [INFO] Updating 1 EPG sources
+[2025-05-10T12:55:06.205Z] [INFO] Fetching EPG data from: http://example.com/epg.xml
+[2025-05-10T12:55:06.659Z] [ERROR] Error fetching EPG data from http://example.com/epg.xml: Request failed with status code 404
+[2025-05-10T12:55:06.660Z] [INFO] No cached EPG data found
+[2025-05-10T12:55:06.830Z] [ERROR] Error fetching EPG data from http://example.com/epg.xml: Request failed with status code 404
+[2025-05-10T12:55:06.831Z] [INFO] No cached EPG data found
+[2025-05-10T13:08:25.621Z] [INFO] Initializing EPG manager
+[2025-05-10T13:08:25.622Z] [INFO] No cached EPG data found
+[2025-05-10T13:17:17.076Z] [INFO] Initializing EPG manager
+[2025-05-10T13:17:17.077Z] [INFO] No cached EPG data found
+[2025-05-10T13:17:48.731Z] [INFO] Initializing EPG manager
+[2025-05-10T13:17:48.732Z] [INFO] No cached EPG data found
+[2025-05-10T13:18:11.257Z] [INFO] Initializing EPG manager
+[2025-05-10T13:18:11.258Z] [INFO] No cached EPG data found
+[2025-05-10T13:19:05.630Z] [INFO] Initializing EPG manager
+[2025-05-10T13:19:05.631Z] [INFO] No cached EPG data found
+[2025-05-10T13:21:49.145Z] [INFO] Initializing EPG manager
+[2025-05-10T13:21:49.146Z] [INFO] No cached EPG data found
+[2025-05-10T13:27:51.448Z] [INFO] Initializing EPG manager
+[2025-05-10T13:27:51.449Z] [INFO] No cached EPG data found
+[2025-05-10T13:30:01.270Z] [INFO] Initializing EPG manager
+[2025-05-10T13:30:01.271Z] [INFO] No cached EPG data found
+[2025-05-10T13:31:34.692Z] [INFO] Initializing EPG manager
+[2025-05-10T13:31:34.692Z] [INFO] No cached EPG data found
+[2025-05-10T13:36:35.476Z] [INFO] Initializing EPG manager
+[2025-05-10T13:36:35.477Z] [INFO] No cached EPG data found
+[2025-05-10T13:42:40.838Z] [INFO] Initializing EPG manager
+[2025-05-10T13:42:40.839Z] [INFO] No cached EPG data found
+[2025-05-10T13:43:21.420Z] [INFO] Initializing EPG manager
+[2025-05-10T13:43:21.421Z] [INFO] No cached EPG data found
+[2025-05-10T14:03:13.564Z] [INFO] Initializing EPG manager
+[2025-05-10T14:03:13.564Z] [INFO] No cached EPG data found
+[2025-05-10T14:05:42.318Z] [INFO] Initializing EPG manager
+[2025-05-10T14:05:42.319Z] [INFO] No cached EPG data found
+[2025-05-10T14:08:48.986Z] [INFO] Initializing EPG manager
+[2025-05-10T14:08:48.987Z] [INFO] No cached EPG data found
+[2025-05-10T14:09:30.443Z] [INFO] Initializing EPG manager
+[2025-05-10T14:09:30.444Z] [INFO] No cached EPG data found
+[2025-05-10T14:15:32.916Z] [INFO] Initializing EPG manager
+[2025-05-10T14:15:32.916Z] [INFO] No cached EPG data found
+[2025-05-10T14:19:00.033Z] [INFO] Initializing EPG manager
+[2025-05-10T14:19:00.033Z] [INFO] No cached EPG data found

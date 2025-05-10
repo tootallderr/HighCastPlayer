@@ -1,9 +1,23 @@
 {
   "remote": [
     {
-      "name": "Sample IPTV List",
+      "name": "TVPass Playlist",
+      "url": "https://tvpass.org/playlist/m3u",
+      "added": "2025-05-10T14:30:00.000Z",
+      "enabled": true
+    },
+    {
+      "name": "MovieJoy Playlist",
+      "url": "http://moviejoy.stream/playlist.m3u",
+      "added": "2025-05-10T14:30:00.000Z",
+      "enabled": true
+    },
+    {
+      "name": "IPTV.org Backup",
       "url": "https://iptv-org.github.io/iptv/index.m3u",
-      "added": "2025-05-08T21:40:00.000Z"
+      "added": "2025-05-08T21:40:00.000Z",
+      "updated": "2025-05-10T14:30:00.000Z",
+      "enabled": true
     }
   ],
   "local": []

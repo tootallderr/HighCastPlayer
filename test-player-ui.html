@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Player UI Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-left: 3px solid #4CAF50;
+            padding-left: 10px;
+        }
+        .error {
+            border-left-color: #f44336;
+            background-color: #ffebee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IPTV Player UI Test</h1>
+        
+        <div>
+            <button id="loadChannels" class="button">Load Channels</button>
+            <button id="clearLog" class="button">Clear Log</button>
+        </div>
+        
+        <div class="output" id="output"></div>
+    </div>
+    
+    <script>
+        // Mock electron IPC for testing
+        const mockIPC = {
+            channels: [],
+            
+            initializePlayer: function() {
+                this.log("Initializing player engine...");
+                setTimeout(() => {
+                    this.log("Player engine initialized");                    this.channels = [
+                        {
+                            id: "tvpass-1",
+                            title: "TVPass News Channel",
+                            group: "News",
+                            url: "https://tvpass.org/streams/news/main.m3u8"
+                        },
+                        {
+                            id: "moviejoy-1",
+                            title: "MovieJoy Classics",
+                            group: "Movies",
+                            url: "http://moviejoy.stream/classic/stream.m3u8"
+                        },
+                        {
+                            id: "sports-1",
+                            title: "Sports Live",
+                            group: "Sports",
+                            url: "https://tvpass.org/streams/sports/live.m3u8"
+                        }
+                    ];
+                }, 1000);
+            },
+            
+            getChannels: function() {
+                return new Promise((resolve, reject) => {
+                    // If channels are already loaded, return them immediately
+                    if (this.channels.length > 0) {
+                        this.log(`Returning ${this.channels.length} channels`);
+                        resolve(this.channels);
+                        return;
+                    }
+                    
+                    // Otherwise initialize player and return channels
+                    this.log("No channels loaded yet, initializing player...");
+                    this.initializePlayer();
+                    
+                    // Wait a bit to simulate IPC delay
+                    setTimeout(() => {
+                        if (this.channels.length > 0) {
+                            this.log(`Loaded ${this.channels.length} channels`);
+                            resolve(this.channels);
+                        } else {
+                            const errorMsg = "Failed to load channels";
+                            this.logError(errorMsg);
+                            reject(new Error(errorMsg));
+                        }
+                    }, 1500);
+                });
+            },
+            
+            log: function(message) {
+                const output = document.getElementById('output');
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                output.appendChild(entry);
+                console.log(message);
+            },
+            
+            logError: function(message) {
+                const output = document.getElementById('output');
+                const entry = document.createElement('div');
+                entry.className = 'log-entry error';
+                entry.textContent = `[${new Date().toLocaleTimeString()}] ERROR: ${message}`;
+                output.appendChild(entry);
+                console.error(message);
+            }
+        };
+        
+        // Setup event listeners
+        document.getElementById('loadChannels').addEventListener('click', async () => {
+            try {
+                mockIPC.log("Requesting channels...");
+                const channels = await mockIPC.getChannels();
+                
+                // Display channels in the output
+                mockIPC.log("Displaying channel list:");
+                channels.forEach(channel => {
+                    mockIPC.log(`- ${channel.title} (Group: ${channel.group})`);
+                });
+            } catch (error) {
+                mockIPC.logError(`Failed to load channels: ${error.message}`);
+            }
+        });
+        
+        document.getElementById('clearLog').addEventListener('click', () => {
+            document.getElementById('output').innerHTML = '';
+        });
+        
+        // Initial message
+        mockIPC.log("UI test ready, click 'Load Channels' to begin");
+    </script>
+</body>
+</html>

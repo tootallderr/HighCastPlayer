@@ -1,0 +1,7 @@
+=================================================
+IPTV Player Diagnostic Run - 2025-05-09T22:52:43.870Z
+=================================================
+[2025-05-09T22:52:43.871Z] [INFO] Starting comprehensive diagnostic run
+[2025-05-09T22:52:43.873Z] [INFO] 
+--- Running Player Engine Tests ---
+[2025-05-09T22:52:43.874Z] [INFO] Running test: Player Engine Tests - Tests core video playback functionality

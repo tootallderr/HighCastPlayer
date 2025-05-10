@@ -348,6 +348,7 @@
             <div class="tab" data-tab="recording-settings">Recording</div>
             <div class="tab" data-tab="epg-settings">EPG</div>
             <div class="tab" data-tab="accessibility-settings">Accessibility</div>
+            <div class="tab" data-tab="modernization-settings">Modernization</div>
             <div class="tab" data-tab="app-settings">Application</div>
         </div>
         
@@ -640,6 +641,123 @@
             <div class="form-actions">
                 <button id="save-caption-settings" class="primary-button">Save Caption Settings</button>
                 <div id="caption-settings-notification" class="setting-notification"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="modernization-settings">
+            <div class="setting-group">
+                <div class="setting-group-title">Casting Features</div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Enable Casting</div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" id="enable-casting" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-description">Enable streaming to Chromecast and DLNA devices</div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Preferred Device Type</div>
+                    <div class="setting-control">
+                        <select id="preferred-casting-type">
+                            <option value="any">Any Available</option>
+                            <option value="chromecast">Chromecast</option>
+                            <option value="dlna">DLNA</option>
+                        </select>
+                    </div>
+                    <div class="setting-description">Preferred device type to show at the top of the list</div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Auto-Refresh Devices</div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" id="auto-refresh-devices" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-description">Automatically refresh device list when opening the casting panel</div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Device Cache Duration</div>
+                    <div class="setting-control">
+                        <input type="number" id="device-cache-duration" min="1" max="60" value="15">
+                    </div>
+                    <div class="setting-description">How long to cache discovered devices (in minutes)</div>
+                </div>
+                
+                <div class="setting-row button-row">
+                    <button id="test-casting-btn" class="primary-button">Test Casting</button>
+                    <button id="clear-casting-cache-btn">Clear Device Cache</button>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <div class="setting-group-title">Recommendations</div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Enable Recommendations</div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" id="enable-recommendations" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-description">Enable AI-powered channel recommendations based on viewing history</div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Minimum View Time</div>
+                    <div class="setting-control">
+                        <input type="number" id="min-view-time" min="0" max="300" value="30">
+                    </div>
+                    <div class="setting-description">Minimum viewing time to count as interest (in seconds)</div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">History Limit</div>
+                    <div class="setting-control">
+                        <input type="number" id="history-limit" min="10" max="1000" value="100">
+                    </div>
+                    <div class="setting-description">Maximum number of history entries to keep</div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Recommendation Count</div>
+                    <div class="setting-control">
+                        <input type="number" id="max-recommendations" min="1" max="50" value="10">
+                    </div>
+                    <div class="setting-description">Maximum number of recommendations to show</div>
+                </div>
+                
+                <div class="setting-row button-row">
+                    <button id="view-history-btn" class="primary-button">View History</button>
+                    <button id="clear-history-btn">Clear History</button>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <div class="setting-group-title">Help & Tutorials</div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">Show Feature Help</div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" id="show-feature-help" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-description">Show feature help panels for new users</div>
+                </div>
+                
+                <div class="setting-row button-row">
+                    <button id="reset-help-panels-btn">Reset Help Panels</button>
+                    <button id="show-modernization-tutorial-btn" class="primary-button">Show Tutorial</button>
+                </div>
             </div>
         </div>
         
@@ -1039,6 +1157,24 @@
                     settings.app = settings.app || {};
                     settings.app.autoStart = autoStartToggle.checked;
                     
+                    // Modernization settings
+                    settings.modernization = settings.modernization || {};
+                    settings.modernization.casting = {
+                        enabled: document.getElementById('enable-casting').checked,
+                        preferredDeviceType: document.getElementById('preferred-casting-type').value,
+                        autoRefreshDevices: document.getElementById('auto-refresh-devices').checked,
+                        deviceCacheDuration: parseInt(document.getElementById('device-cache-duration').value) || 15
+                    };
+                    settings.modernization.recommendations = {
+                        enabled: document.getElementById('enable-recommendations').checked,
+                        minViewTime: parseInt(document.getElementById('min-view-time').value) || 30,
+                        historyLimit: parseInt(document.getElementById('history-limit').value) || 100,
+                        maxRecommendations: parseInt(document.getElementById('max-recommendations').value) || 10
+                    };
+                    settings.modernization.help = {
+                        showFeatureHelp: document.getElementById('show-feature-help').checked
+                    };
+                    
                     saveSettingsBtn.textContent = 'Saving...';
                     saveSettingsBtn.disabled = true;
                     
@@ -1097,6 +1233,25 @@
                         
                         // Application settings
                         autoStartToggle.checked = settings.app && settings.app.autoStart === true;
+                        
+                        // Modernization settings
+                        if (settings.modernization && settings.modernization.casting) {
+                            document.getElementById('enable-casting').checked = settings.modernization.casting.enabled !== false;
+                            document.getElementById('preferred-casting-type').value = settings.modernization.casting.preferredDeviceType || 'any';
+                            document.getElementById('auto-refresh-devices').checked = settings.modernization.casting.autoRefreshDevices !== false;
+                            document.getElementById('device-cache-duration').value = settings.modernization.casting.deviceCacheDuration || 15;
+                        }
+                        
+                        if (settings.modernization && settings.modernization.recommendations) {
+                            document.getElementById('enable-recommendations').checked = settings.modernization.recommendations.enabled !== false;
+                            document.getElementById('min-view-time').value = settings.modernization.recommendations.minViewTime || 30;
+                            document.getElementById('history-limit').value = settings.modernization.recommendations.historyLimit || 100;
+                            document.getElementById('max-recommendations').value = settings.modernization.recommendations.maxRecommendations || 10;
+                        }
+                        
+                        if (settings.modernization && settings.modernization.help) {
+                            document.getElementById('show-feature-help').checked = settings.modernization.help.showFeatureHelp !== false;
+                        }
                     } catch (error) {
                         console.error('Error loading settings:', error);
                     }
